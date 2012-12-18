@@ -129,24 +129,25 @@ INSTALLED_APPS = (
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
+    'disable_existing_loggers': True,
+    'formatters': {
+      'verbose': {
+        'format': '%(asctime)s %(module)s %(levelname)s %(process)d %(thread)d %(message)s'
         },
+      'simple': {
+        'format': '%(levelname)s %(message)s'
+        },
+      },
+    'handlers': {
+      'app': {
+        'level': os.environ.get('APP_LOG_LEVEL', 'ERROR'),
+        'class': 'logging.FileHandler',
+        'formatter': 'verbose',
+        'filename': os.environ.get('APP_LOG_PATH', 'app.log')}
+      },
+    'loggers': {
+      '': {
+        'handlers': ['app']
+        }
+      }
     }
-}
