@@ -10,6 +10,9 @@ from django.http import HttpResponse
 
 from sb.healthworker import models
 
+OK = 0
+ERROR_INVALID_INPUT = -1
+
 def _to_json_default(an_object):
   "JSON converter function to convert dates and datetimes to UTC timestamps"
   if an_object is None:
@@ -49,6 +52,8 @@ def _cadre_to_dictionary(cadre):
 def on_cadre_index(request):
   """Get a list of cadres"""
   cadres = models.Cadre.objects.all()
-  return _to_json_response(map(_cadre_to_dictionary, cadres))
+  return _to_json_response(
+      {"status": OK,
+       "cadres": map(_cadre_to_dictionary, cadres)})
 
 
