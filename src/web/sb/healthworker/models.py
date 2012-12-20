@@ -48,7 +48,15 @@ class Cadre(models.Model):
 
 class DistrictType(models.Model):
   "The type of a district like 'Village'"
-  title = models.CharField(max_length=255, null=False, blank=False)
+  title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+  def __unicode__(self):
+    return self.title
+
+class Region(models.Model):
+  title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
@@ -57,8 +65,9 @@ class DistrictType(models.Model):
 
 class District(models.Model):
   "A district like 'The Bronx'"
-  title = models.CharField(max_length=255, null=False, blank=False)
-  type = models.ForeignKey(DistrictType, null=True, blank=True)
+  title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
+  region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
+  type = models.ForeignKey(DistrictType, null=True, blank=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
@@ -67,7 +76,9 @@ class District(models.Model):
 
 class FacilityType(models.Model):
   "A facility type like Hospital"
-  title = models.CharField(max_length=255, null=False, blank=False)
+  title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
   def __unicode__(self):
     return self.title
@@ -77,12 +88,17 @@ class Facility(models.Model):
 
   Like "Dar Es Salam Medical Center"
   """
-  title = models.CharField(max_length=255, null=False, blank=False)
-  district = models.ForeignKey(District, null=True, blank=True)
+  title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
+  district = models.ForeignKey(District, null=True, blank=True, db_index=True)
   address = models.TextField(blank=True, null=True)
+  email = models.CharField(max_length=255, blank=True, null=True)
+  owner = models.CharField(max_length=255, blank=True, null=True)
+  ownership_type = models.CharField(max_length=255, blank=True, null=True)
+  phone = models.CharField(max_length=255, blank=True, null=True)
+  place_type = models.CharField(max_length=64, blank=True, null=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-  type = models.ForeignKey(FacilityType, null=False, blank=False)
+  type = models.ForeignKey(FacilityType, null=False, blank=False, db_index=True)
 
   def __unicode__(self):
     return self.title
