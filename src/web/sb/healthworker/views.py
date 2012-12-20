@@ -8,39 +8,13 @@ import time
 from django.core import serializers
 from django.http import HttpResponse
 
+from sb import http
 from sb.healthworker import models
 
 OK = 0
 ERROR_INVALID_INPUT = -1
 
-def _to_json_default(an_object):
-  "JSON converter function to convert dates and datetimes to UTC timestamps"
-  if an_object is None:
-    return None
-  elif isinstance(an_object, datetime.datetime):
-    return time.mktime(an_object.utctimetuple())
-  elif isinstance(an_object, datetime.date):
-    return {"year": an_object.year,
-            "month": an_object.month,
-            "day": an_object.day}
-  else:
-    raise TypeError(type(an_object))
 
-def _to_json_response(data, status=200):
-  """Convert 'data' to a JSON response.
-
-  This serializes 'data' to JSON and returns an HTTP response with the
-  "Content-Type" header set to "application/json".
-
-  Arguments:
-  data --- any, a value that json.dumps can marshal
-
-  Returns
-  django.http.HttpResponse
-  """
-  return HttpResponse(json.dumps(data, default=_to_json_default),
-                      status=status,
-                      content_type="application/json")
 
 def _cadre_to_dictionary(cadre):
   "Convert a Cadre to a dictionary suitable for JSON encoding"
@@ -52,8 +26,16 @@ def _cadre_to_dictionary(cadre):
 def on_cadre_index(request):
   """Get a list of cadres"""
   cadres = models.Cadre.objects.all()
-  return _to_json_response(
+  return http.to_json_response(
       {"status": OK,
        "cadres": map(_cadre_to_dictionary, cadres)})
+
+def on_healthworker_index(request):
+  "Get information about a health worker"
+  response = {
+      "status": ERROR_INVALID_INPUT,
+      "health_worker": None}
+  return http.to_json_response(response)
+
 
 

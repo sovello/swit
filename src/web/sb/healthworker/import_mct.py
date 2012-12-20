@@ -1,0 +1,86 @@
+"Importer for the Tanzanian Minsistry of Health (MCT?) Registration Database Spreadsheet"
+import datetime
+import fileinput
+import re
+
+from sb.healthworker import models
+from django.db import transaction
+
+
+def parse_dob(s):
+  """Parse the date of birth column
+
+  This appears to be of the form MM/DD/YY
+  """
+  match = re.match(r"(?P<month>\d+)[/](?P<day>\d+)[/](?P<year>\d+)", s)
+  if match:
+    d = match.groupdict()
+    try:
+      return datetime.date(int(d["year"]), int(d["month"]), int(d["day"]))
+    except ValueError:
+      pass
+
+def main():
+  """main loop"""
+  keys = None
+  for idx, a_line in enumerate(fileinput.input()):
+    if idx == 0:
+      continue
+    fields = a_line.rstrip('\n').split("\t")
+    if not fields:
+      continue
+    if not a_line:
+      continue
+    if idx == 1:
+      keys = fields
+      continue
+    item = dict(zip(keys, fields))
+    #print item
+    registration_numbers = filter(bool, item["Registration No"].split(","))
+    with transaction.commit_on_success():
+      worker = models.HealthWorker()
+      # get auto increment ID
+      for registration_number in registration_numbers:
+        #registration_number = registration_number[1:]
+        if not registration_number:
+          continue
+        num = models.MCTRegistrationNumber()
+        num.number = registration_number
+        num.health_worker = worker
+        num.save()
+      worker.address = item["Address"]
+      worker.birthdate = parse_dob(item["DOB"])
+      worker.cadre = get_cadre_by_abbreviation(item["Cadre"])
+      worker.country = "TZ" if item["Nationality"] == "Tanzanian" else None
+      worker.mct_category = item["Category"]
+      worker.mct_current_employer = item["Current Employer"]
+      worker.mct_dates_of_registration_full = item["Full"]
+      worker.mct_dates_of_registration_provisional = item["Provisional"]
+      worker.mct_dates_of_registration_temporary = item["Temporary"]
+      worker.mct_employer_during_internship = item["Employer during internship"]
+      worker.mct_file_number = item["MCT File No"]
+      worker.mct_qualification_final = item["Final"]
+      worker.mct_qualification_provisional = item["Provisional"]
+      worker.mct_qualification_specialization_1 = item["Specialization 1"]
+      worker.mct_qualification_specialization_2 = item["Specialization 2"]
+      worker.mct_specialty = item["Specialty"]
+      worker.mct_specialty_duration = item["DUR"]
+      worker.name = item["Name"]
+      worker.save()
+
+def get_cadre_by_abbreviation(abbrev):
+  """Get or create a cadre by abbrevation"""
+  if not abbrev:
+    return
+  try:
+    return models.Cadre.objects.get(abbreviation=abbrev)
+  except models.Cadre.DoesNotExist:
+    cadre = models.Cadre()
+    cadre.abbreviation = abbrev
+    cadre.save()
+    return cadre
+
+if __name__ == "__main__":
+  main()
+
+
