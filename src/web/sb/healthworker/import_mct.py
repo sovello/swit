@@ -6,7 +6,6 @@ import re
 from sb.healthworker import models
 from django.db import transaction
 
-
 def parse_dob(s):
   """Parse the date of birth column
 

@@ -42,15 +42,11 @@ def import_specialties():
           super_specialty = models.Specialty()
           super_specialty.title = item['super specialty']
           assert specialty is not None
-          super_specialty.parent = specialty
+          super_specialty.parent_specialty = specialty
           super_specialty.save()
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
       import_specialties()
-
-    def backwards(self, orm):
-      with transaction.commit_on_success():
-        models.Specialty.objects.all().delete()
 
