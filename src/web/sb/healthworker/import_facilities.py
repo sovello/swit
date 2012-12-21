@@ -6,18 +6,6 @@ from django.db import transaction
 
 from sb.healthworker import models
 
-def get_or_create_region_by_title_type(title, region_type_title, parent=None):
-  region_type = models.get_or_create_by_title(models.RegionType, region_type_title)
-  try:
-    return models.Region.objects.get(title=title, type=region_type, parent_region=parent)
-  except models.Region.DoesNotExist:
-    region = models.Region()
-    region.type = region_type
-    region.title = title
-    region.parent_region = parent
-    region.save()
-    return region
-
 def import_facility(f):
   tz = get_or_create_region_by_title_type("TZ", "Country", None)
   district = get_or_create_region_by_title_type(f["district"], "District", tz)
