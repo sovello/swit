@@ -120,8 +120,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'sb.healthworker',
-    'gunicorn'
-)
+    'gunicorn',
+    'south')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

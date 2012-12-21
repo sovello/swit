@@ -5,11 +5,10 @@ from django.db import models
 class HealthWorker(models.Model):
   address = models.TextField(null=True, blank=True)
   birthdate = models.DateField(null=True, blank=True)
-  cadre = models.ForeignKey("Cadre", null=True, blank=True)
   country = models.CharField(max_length=2, null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   email = models.EmailField(null=True, blank=True)
-  facility = models.ForeignKey("Facility", null=True, blank=True)
+  facility = models.ForeignKey("Facility", null=True, blank=True, db_index=True)
   gender = models.CharField(max_length=16, choices=[("male", "Male"), ("female", "Female")], null=False)
   mct_category = models.CharField(max_length=255, null=True, blank=True)
   mct_current_employer = models.CharField(max_length=255, null=True, blank=True)
@@ -28,23 +27,11 @@ class HealthWorker(models.Model):
   name = models.CharField(max_length=255, null=False, blank=False)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
+  specialties = models.ManyToManyField('Specialty')
 
   # This improves the Django admin view:
   def __unicode__(self):
     return self.name
-
-class Cadre(models.Model):
-  """A health worker cadre
-
-  I think this is along the lines of "Doctor" or "Nurse" but I"m not certain
-  """
-  abbreviation = models.CharField(max_length=32, null=False, blank=False, unique=True)
-  title = models.CharField(max_length=255, null=False, blank=False)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-
-  def __unicode__(self):
-    return self.title
 
 class RegionType(models.Model):
   "The type of a region like 'Village'"
@@ -99,12 +86,15 @@ class Facility(models.Model):
 class Specialty(models.Model):
   """A health worker specialty
 
+  The top level specialties are "cadres"
+
   Like "Brain Transplant Surgery"
   """
-  title = models.CharField(max_length=255, blank=False, null=False)
+  title = models.CharField(max_length=255, blank=False, null=False, db_index=True)
+  abbreviation = models.CharField(max_length=32, blank=True, null=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-  parent_specialty = models.ForeignKey("Specialty", blank=True, null=True)
+  parent_specialty = models.ForeignKey("Specialty", blank=True, null=True, db_index=True)
 
   def __unicode__(self):
     return self.title
@@ -130,4 +120,6 @@ def get_or_create_by_title(model, title):
     o.title = title
     o.save()
     return o
+
+
 

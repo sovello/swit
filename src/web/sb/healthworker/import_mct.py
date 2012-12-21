@@ -50,7 +50,9 @@ def main():
         num.save()
       worker.address = item["Address"]
       worker.birthdate = parse_dob(item["DOB"])
-      worker.cadre = get_cadre_by_abbreviation(item["Cadre"])
+      cadre = get_cadre_by_abbreviation(item["Cadre"])
+      if cadre is not None:
+        worker.specialties.add(cadre)
       worker.country = "TZ" if item["Nationality"] == "Tanzanian" else None
       worker.mct_category = item["Category"]
       worker.mct_current_employer = item["Current Employer"]
@@ -73,10 +75,11 @@ def get_cadre_by_abbreviation(abbrev):
   if not abbrev:
     return
   try:
-    return models.Cadre.objects.get(abbreviation=abbrev)
-  except models.Cadre.DoesNotExist:
-    cadre = models.Cadre()
+    return models.Specialty.objects.get(abbreviation=abbrev)
+  except models.Specialty.DoesNotExist:
+    cadre = models.Specialty()
     cadre.abbreviation = abbrev
+    cadre.title = abbrev
     cadre.save()
     return cadre
 
