@@ -39,6 +39,13 @@ class RegionType(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
+  COUNTRY = 'Country'
+  VILLAGE = 'Village'
+  WARD = 'Ward'
+  DISTRICT = 'District'
+  REGION = 'Region'
+  DIVISION = 'Division'
+
   def __unicode__(self):
     return self.title
 
@@ -52,6 +59,19 @@ class Region(models.Model):
 
   def __unicode__(self):
     return self.title
+
+  @classmethod
+  def get_or_create_region_by_title_type(cls, title, region_type_title, parent=None):
+    region_type = get_or_create_by_title(RegionType, region_type_title)
+    try:
+      return Region.objects.get(title__iexact=title, type=region_type, parent_region=parent)
+    except Region.DoesNotExist:
+      region = Region()
+      region.type = region_type
+      region.title = title
+      region.parent_region = parent
+      region.save()
+      return region
 
 class FacilityType(models.Model):
   "A facility type like Hospital"
@@ -114,7 +134,7 @@ def get_or_create_by_title(model, title):
   if not title:
     return None
   try:
-    return model.objects.get(title=title)
+    return model.objects.get(title__iexact=title)
   except model.DoesNotExist:
     o = model()
     o.title = title

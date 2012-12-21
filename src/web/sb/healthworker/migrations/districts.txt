@@ -1,0 +1,140 @@
+REGION,DISTRICT
+Arusha,Arusha DC
+,Arusha MC
+,Karatu DC
+,Longido DC
+,Meru DC
+,Monduli DC
+,Ngorongoro
+Arusha,Arusha DC
+,Arusha MC
+Dar es salaam,Ilala MC
+,Kinondoni MC
+,Temeke MC
+Dodoma,Bahi DC
+,Chamwino DC
+,Dodoma MC
+,Kondoa DC
+,Kongwa DC
+,Mpwapwa DC
+Iringa,Iringa DC
+,Iringa MC
+,Kilolo DC
+,Ludewa DC
+,Makete DC
+,Mufindi DC
+,Njombe DC
+,Njombe TC
+Kagera,Biharamulo DC
+,Bukoba DC
+,Bukoba MC
+,Chato DC
+,Karagwe DC
+,Misenyi
+,Muleba DC
+,Ngara DC
+Kigoma,Kasulu DC
+,Kibondo DC
+,Kigoma DC
+,Kigoma MC
+Kilimanjaro,Hai DC
+,Moshi DC
+,Moshi MC
+,Mwanga DC
+,Rombo DC
+,Same DC
+,Siha DC
+Lindi,Kilwa DC
+,Lindi DC
+,Lindi MC
+,Liwale DC
+,Nachingwea DC
+,Ruangwa DC
+Manyara Babati DC
+,Babati TC
+,Hanang' DC
+,Kiteto DC
+,Mbulu DC
+,Simanjiro DC
+Mara,Bunda DC
+,Musoma DC
+,Musoma MC
+,Rorya DC
+,Serengeti DC
+,Tarime DC
+Mbeya,Chunya DC
+,Ileje DC
+,Kyela DC
+,Mbarali DC
+,Mbeya CC
+,Mbeya DC
+,Mbozi DC
+,Rungwe DC
+Morogoro,Kilombero DC
+,Kilosa DC
+,Morogoro DC
+,Morogoro MC
+,Mvomero DC
+,Ulanga DC
+Mtwara,Masasi DC
+,Mtwara DC
+,Mtwara MC
+,Nanyumbu DC
+,Newala DC
+,Tandahimba DC
+Mwanza,Geita DC
+,Ilemela DC
+,Kwimba DC
+,Magu DC
+,Misungwi DC
+,Nyamagana DC
+,Sengerema DC
+,Ukerewe DC
+Pwani,Bagamoyo DC
+,Kibaha DC
+,Kibaha TC
+,Kisarawe DC
+,Mafia DC
+,Mkuranga DC
+,Rufiji DC
+Rukwa,Mpanda DC
+,Mpanda TC
+,Nkasi DC
+,Sumbawanga DC
+,Sumbawanga MC
+Ruvuma,Mbinga DC
+,Namtumbo DC
+,Songea DC
+,Songea MC
+,Tunduru DC
+Shinyanga,Bariadi DC
+,Bukombe DC
+,Kahama DC
+,Kishapu DC
+,Maswa DC
+,Meatu DC
+,Shinyanga DC
+,Shinyanga MC
+Singida Iramba DC
+,Manyoni DC
+,Singida DC
+,Singida MC
+Tabora,Igunga
+,Igunga
+,Nzega
+,Nzega
+,Sikonge
+,Sikonge
+,Tabora MC
+,Urambo
+,Urambo
+,Uyui
+,Uyui
+Tanga,Handeni DC
+,Kilindi DC
+,Korogwe DC
+,Korogwe TC
+,Lushoto DC
+,Mkinga DC
+,Muheza DC
+,Pangani DC
