@@ -46,8 +46,8 @@ class Cadre(models.Model):
   def __unicode__(self):
     return self.title
 
-class DistrictType(models.Model):
-  "The type of a district like 'Village'"
+class RegionType(models.Model):
+  "The type of a region like 'Village'"
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
@@ -56,18 +56,10 @@ class DistrictType(models.Model):
     return self.title
 
 class Region(models.Model):
+  "A region like 'The Bronx'"
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-
-  def __unicode__(self):
-    return self.title
-
-class District(models.Model):
-  "A district like 'The Bronx'"
-  title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
-  region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
-  type = models.ForeignKey(DistrictType, null=True, blank=True, db_index=True)
+  type = models.ForeignKey(RegionType, null=True, blank=True, db_index=True)
+  parent_region = models.ForeignKey('Region', null=True, blank=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
@@ -89,8 +81,9 @@ class Facility(models.Model):
   Like "Dar Es Salam Medical Center"
   """
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
-  district = models.ForeignKey(District, null=True, blank=True, db_index=True)
+  region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
   address = models.TextField(blank=True, null=True)
+  serial_number = models.CharField(max_length=128, blank=True, null=True, db_index=True)
   email = models.CharField(max_length=255, blank=True, null=True)
   owner = models.CharField(max_length=255, blank=True, null=True)
   ownership_type = models.CharField(max_length=255, blank=True, null=True)
@@ -98,7 +91,7 @@ class Facility(models.Model):
   place_type = models.CharField(max_length=64, blank=True, null=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-  type = models.ForeignKey(FacilityType, null=False, blank=False, db_index=True)
+  type = models.ForeignKey(FacilityType, null=True, blank=False, db_index=True)
 
   def __unicode__(self):
     return self.title
@@ -126,3 +119,15 @@ class MCTRegistrationNumber(models.Model):
 
   def __unicode__(self):
     return self.number
+
+def get_or_create_by_title(model, title):
+  if not title:
+    return None
+  try:
+    return model.objects.get(title=title)
+  except model.DoesNotExist:
+    o = model()
+    o.title = title
+    o.save()
+    return o
+

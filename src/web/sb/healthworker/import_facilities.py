@@ -6,45 +6,47 @@ from django.db import transaction
 
 from sb.healthworker import models
 
-def import_facility(f):
-  facility = models.Facility()
-  facility.town = f["town"]
-  facility.title = f["title"]
-  facility.owner = f["owner"]
-  facility.ownership_type = f["ownership_type"]
-  facility.address = f["address"]
-  facility.phone = f["telephone"]
-  facility.email = f["email"]
-  facility.place_type = f["place_type"]
-  if f["type"]:
-    try:
-      facility.type = models.FacilityType.objects.get(title=f["type"])
-    except models.FacilityType.DoesNotExist:
-      type = models.FacilityType()
-      type.title = f["type"]
-      type.save()
-      facility.type = type
+def get_or_create_region_by_title_type(title, region_type_title, parent=None):
+  region_type = models.get_or_create_by_title(models.RegionType, region_type_title)
+  try:
+    return models.Region.objects.get(title=title, type=region_type, parent_region=parent)
+  except models.Region.DoesNotExist:
+    region = models.Region()
+    region.type = region_type
+    region.title = title
+    region.parent_region = parent
+    region.save()
+    return region
 
-  if f["district"]:
-    try:
-      facility.district = models.District.objects.get(title=f["district"])
-    except models.District.DoesNotExist:
-      district = models.District()
-      district.title = f["district"]
-      district.save()
-      facility.district = district
+def import_facility(f):
+  tz = get_or_create_region_by_title_type("TZ", "Country", None)
+  district = get_or_create_region_by_title_type(f["district"], "District", tz)
+  division = get_or_create_region_by_title_type(f["division"], "Division", district)
+  ward = get_or_create_region_by_title_type(f["ward"], "Ward", division)
+  facility = models.Facility()
+  facility.region = get_or_create_region_by_title_type(f["village"], "Village", ward)
+  facility.title = f["fname"]
+  facility.serial_number = f["sn"]
+  facility.place_type = f["place"]
+  facility.ownership_type = f["owner2"]
+  facility.owner = f["owner"]
+  facility.address = f["mitaa"]
+  facility.type = models.get_or_create_by_title(models.FacilityType, f["ftype"])
   facility.save()
   print "added ", facility
 
-
-
 def main():
   with transaction.commit_on_success():
-    for line in fileinput.input():
-      f = json.loads(line)
-      import_facility(f)
-
-
+    fields = []
+    for idx, line in enumerate(fileinput.input()):
+      values = line.decode('utf-8').rstrip('\n').split('\t')
+      if idx == 0:
+        fields = [i.lower() for i in values]
+      else:
+        f = dict(zip(fields, values))
+        print f
+        if f.get('fname'):
+          import_facility(f)
 
 if __name__ == '__main__':
   main()
