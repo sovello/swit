@@ -23,25 +23,24 @@ def parse_dob(s):
 def main():
   """main loop"""
   keys = None
-  for idx, a_line in enumerate(fileinput.input()):
-    if idx == 0:
-      continue
-    fields = a_line.rstrip('\n').split("\t")
-    if not fields:
-      continue
-    if not a_line:
-      continue
-    if idx == 1:
-      keys = fields
-      continue
-    item = dict(zip(keys, fields))
-    #print item
-    registration_numbers = filter(bool, item["Registration No"].split(","))
-    with transaction.commit_on_success():
+  with transaction.commit_on_success():
+    for idx, a_line in enumerate(fileinput.input()):
+      if idx == 0:
+        continue
+      fields = a_line.rstrip('\n').split("\t")
+      if not fields:
+        continue
+      if not a_line:
+        continue
+      if idx == 1:
+        keys = fields
+        continue
+      item = dict(zip(keys, fields))
+      registration_numbers = filter(bool, item["Registration No"].split(","))
       worker = models.HealthWorker()
       # get auto increment ID
+      worker.save()
       for registration_number in registration_numbers:
-        #registration_number = registration_number[1:]
         if not registration_number:
           continue
         num = models.MCTRegistrationNumber()
@@ -50,7 +49,7 @@ def main():
         num.save()
       worker.address = item["Address"]
       worker.birthdate = parse_dob(item["DOB"])
-      cadre = get_cadre_by_abbreviation(item["Cadre"])
+      cadre = models.Specialty.get_or_create_by_abbreviation(item["Cadre"])
       if cadre is not None:
         worker.specialties.add(cadre)
       worker.country = "TZ" if item["Nationality"] == "Tanzanian" else None
@@ -66,6 +65,11 @@ def main():
       worker.mct_qualification_specialization_1 = item["Specialization 1"]
       worker.mct_qualification_specialization_2 = item["Specialization 2"]
       worker.mct_specialty = item["Specialty"]
+      if cadre and item["Specialty"]:
+        specialties = models.Specialty.objects.filter(title__iexact=item["Specialty"])
+        for s in specialties:
+          if s.is_child_of(cadre):
+            worker.specialties.add(s)
       worker.mct_specialty_duration = item["DUR"]
       worker.name = item["Name"]
       worker.save()

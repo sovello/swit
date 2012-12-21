@@ -116,8 +116,36 @@ class Specialty(models.Model):
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   parent_specialty = models.ForeignKey("Specialty", blank=True, null=True, db_index=True)
 
+  def tree(self):
+    curr = self
+    while curr is not None:
+      yield curr
+      curr = curr.parent_specialty
+
   def __unicode__(self):
-    return self.title
+    return u' -> '.join([i.title for i in reversed(list(self.tree()))])
+
+  def is_child_of(self, ancestor):
+    curr = self
+    while curr is not None:
+      if ancestor.id == curr.parent_specialty_id:
+        return True
+      curr = curr.parent_specialty
+    return False
+
+  @classmethod
+  def get_or_create_by_abbreviation(cls, abbrev):
+    """Get or create a specialty by an abbreviation"""
+    if not abbrev:
+      return
+    try:
+      return Specialty.objects.get(abbreviation__iexact=abbrev)
+    except Specialty.DoesNotExist:
+      specialty = models.Specialty()
+      specialty.abbreviation = abbrev
+      specialty.title = abbrev
+      specialty.save()
+      return specialty
 
 class MCTRegistrationNumber(models.Model):
   """Tanzanian Ministry of Health Registration number
@@ -140,6 +168,4 @@ def get_or_create_by_title(model, title):
     o.title = title
     o.save()
     return o
-
-
 
