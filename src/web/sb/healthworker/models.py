@@ -178,3 +178,15 @@ def get_or_create_by_title(model, title):
     o.save()
     return o
 
+class MCTPayroll(models.Model):
+  last_name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  designation = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  birthdate = models.DateField(max_length=255, null=True, blank=True)
+  check_number = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  district = models.CharField(max_length=255, null=True, blank=True)
+  health_worker = models.ForeignKey(HealthWorker, null=True, blank=True, db_index=True)
+  specialty = models.ForeignKey(Specialty, null=True, blank=True, db_index=True)
+  facility = models.ForeignKey(Facility, null=True, blank=True, db_index=True)
+  region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
+
