@@ -73,6 +73,15 @@ class Region(models.Model):
       region.save()
       return region
 
+  def subregion_ids(self):
+    result = set()
+    parent_region_ids = [self.id]
+    while parent_region_ids:
+      subregions = list(Region.objects.filter(parent_region_id__in=parent_region_ids).all())
+      parent_region_ids = [i.id for i in subregions]
+      result.update(parent_region_ids)
+    return result
+
 class FacilityType(models.Model):
   "A facility type like Hospital"
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)

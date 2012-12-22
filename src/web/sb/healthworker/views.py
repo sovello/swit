@@ -89,7 +89,7 @@ def _facility_to_dictionary(facility):
       "id": facility.id,
       "title": facility.title,
       "address": facility.address,
-      "type": facility.type.title,
+      "type": facility.type.title if facility.type else None,
       "place_type": facility.place_type,
       "serial_number": facility.serial_number,
       "owner": facility.owner,
@@ -105,10 +105,18 @@ def on_facility_index(request):
   title = request.GET.get("title")
   if title:
     facilities = facilities.filter(title__istartswith=title)
-  region_id = request.GET.get("region_id")
+  region_id = request.GET.get("region")
   if region_id:
     # compute subregions here.
-    facilities = facilities.filter(region_id=region_id)
+    region_ids = set()
+    try:
+      region = models.Region.objects.get(id=region_id)
+    except models.Region.DoesNotExist:
+      pass
+    else:
+      region_ids.add(region.id)
+      region_ids.update(region.subregion_ids())
+    facilities = facilities.filter(region_id__in=region_ids)
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
   response = {
