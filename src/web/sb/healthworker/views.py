@@ -29,11 +29,32 @@ def on_specialty_index(request):
       {"status": OK,
        "specialties": map(_specialty_to_dictionary, specialties)})
 
-def on_healthworker_index(request):
+def on_health_worker_index(request):
   "Get information about a health worker"
-  response = {
-      "status": ERROR_INVALID_INPUT,
-      "health_worker": None}
+  health_workers = models.HealthWorker.objects
+  num = request.GET.get("registration")
+  try:
+    count = int(request.GET.get("count", 10))
+  except (ValueError, TypeError), error:
+    count = 10
+  if num:
+    health_workers = health_workers.filter(mct_registration_numbers__number__iexact=num)
+  health_worker_dicts = []
+  for h in health_workers.all()[:count]:
+    health_worker_dicts.append({
+      "id": h.id,
+      "name": h.name,
+      "country": h.country,
+      "birthdate": h.birthdate,
+      "vodacom_phone": h.vodacom_phone,
+      "email": h.email,
+      "facility": h.facility.id if h.facility else None,
+      "specialties": [i.id for i in h.specialties.all()],
+      "register_numbers": [i.number for i in h.mct_registration_numbers.all()],
+      "created_at": h.created_at,
+      "updated_at": h.updated_at})
+
+  response = {"status": OK, "health_workers": health_worker_dicts}
   return http.to_json_response(response)
 
 def _region_to_dictionary(region):

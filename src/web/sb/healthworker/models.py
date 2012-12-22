@@ -27,33 +27,33 @@ class HealthWorker(models.Model):
   name = models.CharField(max_length=255, null=False, blank=False)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
-  specialties = models.ManyToManyField('Specialty')
+  specialties = models.ManyToManyField("Specialty")
 
   # This improves the Django admin view:
   def __unicode__(self):
     return self.name
 
 class RegionType(models.Model):
-  "The type of a region like 'Village'"
+  """The type of a region like "Village" """
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
-  COUNTRY = 'Country'
-  VILLAGE = 'Village'
-  WARD = 'Ward'
-  DISTRICT = 'District'
-  REGION = 'Region'
-  DIVISION = 'Division'
+  COUNTRY = "Country"
+  VILLAGE = "Village"
+  WARD = "Ward"
+  DISTRICT = "District"
+  REGION = "Region"
+  DIVISION = "Division"
 
   def __unicode__(self):
     return self.title
 
 class Region(models.Model):
-  "A region like 'The Bronx'"
+  """A region like "The Bronx" """
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   type = models.ForeignKey(RegionType, null=True, blank=True, db_index=True)
-  parent_region = models.ForeignKey('Region', null=True, blank=True, db_index=True)
+  parent_region = models.ForeignKey("Region", null=True, blank=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
 
@@ -123,7 +123,7 @@ class Specialty(models.Model):
       curr = curr.parent_specialty
 
   def __unicode__(self):
-    return u' -> '.join([i.title for i in reversed(list(self.tree()))])
+    return u" -> ".join([i.title for i in reversed(list(self.tree()))])
 
   def is_child_of(self, ancestor):
     curr = self
@@ -153,7 +153,7 @@ class MCTRegistrationNumber(models.Model):
   number = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-  health_worker = models.ForeignKey("HealthWorker", blank=True, null=True, db_index=True)
+  health_worker = models.ForeignKey("HealthWorker", blank=True, null=True, db_index=True, related_name="mct_registration_numbers")
 
   def __unicode__(self):
     return self.number
