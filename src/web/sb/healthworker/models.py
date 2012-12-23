@@ -183,7 +183,6 @@ class MCTRegistration(models.Model):
   file_number = models.CharField(max_length=255, null=True, blank=True)
   health_worker = models.ForeignKey(HealthWorker, null=True, blank=True, db_index=True)
   name = models.CharField(max_length=255, null=False, blank=False)
-  other_phone = models.CharField(max_length=255, null=True, blank=True)
   qualification_final = models.CharField(max_length=255, null=True, blank=True)
   qualification_provisional = models.CharField(max_length=255, null=True, blank=True)
   qualification_specialization_1 = models.CharField(max_length=255, null=True, blank=True)

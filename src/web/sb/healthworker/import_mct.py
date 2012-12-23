@@ -55,6 +55,7 @@ def main():
       if cadre is not None:
         worker.specialties.add(cadre)
       worker.country = "TZ" if item["Nationality"] == "Tanzanian" else None
+      worker.cadre = item["Cadre"]
       worker.category = item["Category"]
       worker.current_employer = item["Current Employer"]
       worker.dates_of_registration_full = item["Full"]
