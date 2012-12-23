@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from sb import http
 from sb.healthworker import models
 
+
 OK = 0
 ERROR_INVALID_INPUT = -1
 
@@ -31,30 +32,54 @@ def on_specialty_index(request):
 
 def on_health_worker_index(request):
   "Get information about a health worker"
-  health_workers = models.HealthWorker.objects
+  health_workers = models.MCTRegistration.objects
   num = request.GET.get("registration")
+  name = request.GET.get("name")
+  count = request.GET.get("count", 20)
   try:
-    count = int(request.GET.get("count", 10))
+    count = int(count)
   except (ValueError, TypeError), error:
-    count = 10
+    count = 20
   if num:
-    health_workers = health_workers.filter(mct_registration_numbers__number__iexact=num)
+    health_workers = health_workers.filter(registration_number=num)
+  if name:
+    # FIXME: do levenshtein
+    health_workers = health_workers.filter(name__istartswith=name)
+
   health_worker_dicts = []
   for h in health_workers.all()[:count]:
     health_worker_dicts.append({
+      "address": h.address,
+      "birthdate": h.birthdate,
+      "cadre": h.cadre,
+      "category": h.category,
+      "country": h.country,
+      "created_at": h.created_at,
+      "current_employer": h.current_employer,
+      "dates_of_registration_full": h.dates_of_registration_full,
+      "dates_of_registration_provisional": h.dates_of_registration_provisional,
+      "dates_of_registration_temporary": h.dates_of_registration_temporary,
+      "email": h.email,
+      "employer_during_internship": h.employer_during_internship,
+      "facility": h.facility.id if h.facility else None,
+      "file_number": h.file_number,
+
       "id": h.id,
       "name": h.name,
-      "country": h.country,
-      "birthdate": h.birthdate,
-      "vodacom_phone": h.vodacom_phone,
-      "email": h.email,
-      "facility": h.facility.id if h.facility else None,
+      "qualification_final": h.qualification_final,
+      "qualification_provisional": h.qualification_provisional,
+      "qualification_specialization_1": h.qualification_specialization_1,
+      "qualification_specialization_2": h.qualification_specialization_2,
+      "registration_number": h.registration_number,
+      "registration_type": h.registration_type,
       "specialties": [i.id for i in h.specialties.all()],
-      "register_numbers": [i.number for i in h.mct_registration_numbers.all()],
-      "created_at": h.created_at,
+      "specialty": h.specialty,
+      "specialty_duration": h.specialty_duration,
       "updated_at": h.updated_at})
 
-  response = {"status": OK, "health_workers": health_worker_dicts}
+  response = {
+      "status": OK,
+      "health_workers": health_worker_dicts}
   return http.to_json_response(response)
 
 def _region_to_dictionary(region):

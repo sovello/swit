@@ -10,24 +10,11 @@ class HealthWorker(models.Model):
   email = models.EmailField(null=True, blank=True)
   facility = models.ForeignKey("Facility", null=True, blank=True, db_index=True)
   gender = models.CharField(max_length=16, choices=[("male", "Male"), ("female", "Female")], null=False)
-  mct_category = models.CharField(max_length=255, null=True, blank=True)
-  mct_current_employer = models.CharField(max_length=255, null=True, blank=True)
-  mct_dates_of_registration_full = models.CharField(max_length=255, null=True, blank=True)
-  mct_dates_of_registration_provisional = models.CharField(max_length=255, null=True, blank=True)
-  mct_dates_of_registration_temporary = models.CharField(max_length=255, null=True, blank=True)
-  mct_employer_during_internship = models.CharField(max_length=255, null=True, blank=True)
-  mct_file_number = models.CharField(max_length=255, null=True, blank=True)
-  other_phone = models.CharField(max_length=255, null=True, blank=True)
-  mct_qualification_final = models.CharField(max_length=255, null=True, blank=True)
-  mct_qualification_provisional = models.CharField(max_length=255, null=True, blank=True)
-  mct_qualification_specialization_1 = models.CharField(max_length=255, null=True, blank=True)
-  mct_qualification_specialization_2 = models.CharField(max_length=255, null=True, blank=True)
-  mct_specialty = models.CharField(max_length=255, null=True, blank=True)
-  mct_specialty_duration = models.CharField(max_length=255, null=True, blank=True)
   name = models.CharField(max_length=255, null=False, blank=False)
+  other_phone = models.CharField(max_length=255, null=True, blank=True)
+  specialties = models.ManyToManyField("Specialty")
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
-  specialties = models.ManyToManyField("Specialty")
 
   # This improves the Django admin view:
   def __unicode__(self):
@@ -156,17 +143,6 @@ class Specialty(models.Model):
       specialty.save()
       return specialty
 
-class MCTRegistrationNumber(models.Model):
-  """Tanzanian Ministry of Health Registration number
-  """
-  number = models.CharField(max_length=255, null=False, blank=False, db_index=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
-  health_worker = models.ForeignKey("HealthWorker", blank=True, null=True, db_index=True, related_name="mct_registration_numbers")
-
-  def __unicode__(self):
-    return self.number
-
 def get_or_create_by_title(model, title):
   if not title:
     return None
@@ -189,4 +165,36 @@ class MCTPayroll(models.Model):
   specialty = models.ForeignKey(Specialty, null=True, blank=True, db_index=True)
   facility = models.ForeignKey(Facility, null=True, blank=True, db_index=True)
   region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
+
+class MCTRegistration(models.Model):
+  address = models.TextField(null=True, blank=True)
+  birthdate = models.DateField(null=True, blank=True)
+  cadre = models.CharField(max_length=255, null=True, blank=True)
+  category = models.CharField(max_length=255, null=True, blank=True)
+  country = models.CharField(max_length=2, null=True, blank=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  current_employer = models.CharField(max_length=255, null=True, blank=True)
+  dates_of_registration_full = models.CharField(max_length=255, null=True, blank=True)
+  dates_of_registration_provisional = models.CharField(max_length=255, null=True, blank=True)
+  dates_of_registration_temporary = models.CharField(max_length=255, null=True, blank=True)
+  email = models.EmailField(null=True, blank=True)
+  employer_during_internship = models.CharField(max_length=255, null=True, blank=True)
+  facility = models.ForeignKey("Facility", null=True, blank=True, db_index=True)
+  file_number = models.CharField(max_length=255, null=True, blank=True)
+  health_worker = models.ForeignKey(HealthWorker, null=True, blank=True, db_index=True)
+  name = models.CharField(max_length=255, null=False, blank=False)
+  other_phone = models.CharField(max_length=255, null=True, blank=True)
+  qualification_final = models.CharField(max_length=255, null=True, blank=True)
+  qualification_provisional = models.CharField(max_length=255, null=True, blank=True)
+  qualification_specialization_1 = models.CharField(max_length=255, null=True, blank=True)
+  qualification_specialization_2 = models.CharField(max_length=255, null=True, blank=True)
+  registration_number = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  registration_type = models.CharField(max_length=2, null=True, blank=True)
+  specialties = models.ManyToManyField("Specialty")
+  specialty = models.CharField(max_length=255, null=True, blank=True)
+  specialty_duration = models.CharField(max_length=255, null=True, blank=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+  def __unicode__(self):
+    return self.name
 

@@ -18,21 +18,8 @@ class Migration(SchemaMigration):
             ('email', self.gf('django.db.models.fields.EmailField')(max_length=75, null=True, blank=True)),
             ('facility', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.Facility'], null=True, blank=True)),
             ('gender', self.gf('django.db.models.fields.CharField')(max_length=16)),
-            ('mct_category', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_current_employer', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_dates_of_registration_full', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_dates_of_registration_provisional', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_dates_of_registration_temporary', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_employer_during_internship', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_file_number', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('other_phone', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_qualification_final', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_qualification_provisional', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_qualification_specialization_1', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_qualification_specialization_2', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_specialty', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('mct_specialty_duration', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('other_phone', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
             ('vodacom_phone', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
         ))
@@ -104,15 +91,61 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('healthworker', ['Specialty'])
 
-        # Adding model 'MCTRegistrationNumber'
-        db.create_table('healthworker_mctregistrationnumber', (
+        # Adding model 'MCTPayroll'
+        db.create_table('healthworker_mctpayroll', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('number', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('last_name', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
+            ('designation', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
+            ('birthdate', self.gf('django.db.models.fields.DateField')(max_length=255, null=True, blank=True)),
+            ('check_number', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
+            ('district', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('health_worker', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.HealthWorker'], null=True, blank=True)),
+            ('specialty', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.Specialty'], null=True, blank=True)),
+            ('facility', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.Facility'], null=True, blank=True)),
+            ('region', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.Region'], null=True, blank=True)),
         ))
-        db.send_create_signal('healthworker', ['MCTRegistrationNumber'])
+        db.send_create_signal('healthworker', ['MCTPayroll'])
+
+        # Adding model 'MCTRegistration'
+        db.create_table('healthworker_mctregistration', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('address', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('birthdate', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('cadre', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('category', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('country', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('current_employer', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('dates_of_registration_full', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('dates_of_registration_provisional', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('dates_of_registration_temporary', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('email', self.gf('django.db.models.fields.EmailField')(max_length=75, null=True, blank=True)),
+            ('employer_during_internship', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('facility', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.Facility'], null=True, blank=True)),
+            ('file_number', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('health_worker', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['healthworker.HealthWorker'], null=True, blank=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('other_phone', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('qualification_final', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('qualification_provisional', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('qualification_specialization_1', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('qualification_specialization_2', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('registration_number', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
+            ('registration_type', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
+            ('specialty', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('specialty_duration', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal('healthworker', ['MCTRegistration'])
+
+        # Adding M2M table for field specialties on 'MCTRegistration'
+        db.create_table('healthworker_mctregistration_specialties', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('mctregistration', models.ForeignKey(orm['healthworker.mctregistration'], null=False)),
+            ('specialty', models.ForeignKey(orm['healthworker.specialty'], null=False))
+        ))
+        db.create_unique('healthworker_mctregistration_specialties', ['mctregistration_id', 'specialty_id'])
 
 
     def backwards(self, orm):
@@ -137,8 +170,14 @@ class Migration(SchemaMigration):
         # Deleting model 'Specialty'
         db.delete_table('healthworker_specialty')
 
-        # Deleting model 'MCTRegistrationNumber'
-        db.delete_table('healthworker_mctregistrationnumber')
+        # Deleting model 'MCTPayroll'
+        db.delete_table('healthworker_mctpayroll')
+
+        # Deleting model 'MCTRegistration'
+        db.delete_table('healthworker_mctregistration')
+
+        # Removing M2M table for field specialties on 'MCTRegistration'
+        db.delete_table('healthworker_mctregistration_specialties')
 
 
     models = {
@@ -175,31 +214,55 @@ class Migration(SchemaMigration):
             'facility': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.Facility']", 'null': 'True', 'blank': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'mct_category': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_current_employer': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_dates_of_registration_full': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_dates_of_registration_provisional': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_dates_of_registration_temporary': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_employer_during_internship': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_file_number': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_qualification_final': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_qualification_provisional': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_qualification_specialization_1': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_qualification_specialization_2': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_specialty': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mct_specialty_duration': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'other_phone': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'specialties': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['healthworker.Specialty']", 'symmetrical': 'False'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'vodacom_phone': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
         },
-        'healthworker.mctregistrationnumber': {
-            'Meta': {'object_name': 'MCTRegistrationNumber'},
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+        'healthworker.mctpayroll': {
+            'Meta': {'object_name': 'MCTPayroll'},
+            'birthdate': ('django.db.models.fields.DateField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'check_number': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'designation': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'district': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'facility': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.Facility']", 'null': 'True', 'blank': 'True'}),
             'health_worker': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.HealthWorker']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'number': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'region': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.Region']", 'null': 'True', 'blank': 'True'}),
+            'specialty': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.Specialty']", 'null': 'True', 'blank': 'True'})
+        },
+        'healthworker.mctregistration': {
+            'Meta': {'object_name': 'MCTRegistration'},
+            'address': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'birthdate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'cadre': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'category': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'country': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'current_employer': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'dates_of_registration_full': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'dates_of_registration_provisional': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'dates_of_registration_temporary': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True', 'blank': 'True'}),
+            'employer_during_internship': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'facility': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.Facility']", 'null': 'True', 'blank': 'True'}),
+            'file_number': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'health_worker': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['healthworker.HealthWorker']", 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'other_phone': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'qualification_final': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'qualification_provisional': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'qualification_specialization_1': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'qualification_specialization_2': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'registration_number': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'registration_type': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
+            'specialties': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['healthworker.Specialty']", 'symmetrical': 'False'}),
+            'specialty': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'specialty_duration': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'})
         },
         'healthworker.region': {
