@@ -45,9 +45,12 @@ def on_mct_payroll_index(request):
   if check:
     mct_payroll_entries = mct_payroll_entries.filter(check_number=check)
   mct_payroll_entries = mct_payroll_entries.all()
+  mct_payroll_entries = list(mct_payroll_entries)
+  total = len(mct_payroll_entries)
   mct_payroll_entries = mct_payroll_entries[offset:count]
   return http.to_json_response({
     "status": OK,
+    "total": total,
     "mct_payrolls": [{
         "id": i.id,
         "name": i.name,
@@ -67,19 +70,19 @@ def on_mct_registration_index(request):
   health_workers = models.MCTRegistration.objects
   num = request.GET.get("registration")
   name = request.GET.get("name")
-  count = request.GET.get("count", 20)
-  try:
-    count = int(count)
-  except (ValueError, TypeError), error:
-    count = 20
+  count = sb.util.safe(lambda:int(request.GET["count"])) or 100
+  offset = sb.util.safe(lambda:int(request.GET["offset"])) or 0
   if num:
     health_workers = health_workers.filter(registration_number=num)
   if name:
     # FIXME: do levenshtein
     health_workers = health_workers.filter(name__istartswith=name)
 
+  health_workers = list(health_workers.all())
+  total = len(health_workers)
+
   health_worker_dicts = []
-  for h in health_workers.all()[:count]:
+  for h in health_workers[offset:count]:
     health_worker_dicts.append({
       "address": h.address,
       "birthdate": h.birthdate,
@@ -95,7 +98,6 @@ def on_mct_registration_index(request):
       "employer_during_internship": h.employer_during_internship,
       "facility": h.facility.id if h.facility else None,
       "file_number": h.file_number,
-
       "id": h.id,
       "name": h.name,
       "qualification_final": h.qualification_final,
@@ -108,9 +110,9 @@ def on_mct_registration_index(request):
       "specialty": h.specialty,
       "specialty_duration": h.specialty_duration,
       "updated_at": h.updated_at})
-
   response = {
       "status": OK,
+      "total": total,
       "health_workers": health_worker_dicts}
   return http.to_json_response(response)
 
