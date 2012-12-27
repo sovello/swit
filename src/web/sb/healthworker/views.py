@@ -3,17 +3,23 @@
 
 import datetime
 import json
+import re
 import time
+import types
 
 from django.core import serializers
 from django.http import HttpResponse
+from django import forms
+from django.db import transaction
 
 from sb import http
 from sb.healthworker import models
-
+import sb.util
 
 OK = 0
 ERROR_INVALID_INPUT = -1
+ERROR_INVALID_PATTERN = -2
+
 
 def _specialty_to_dictionary(specialty):
   "Convert a Specialty to a dictionary suitable for JSON encoding"
@@ -26,11 +32,37 @@ def _specialty_to_dictionary(specialty):
 def on_specialty_index(request):
   """Get a list of specialties"""
   specialties = models.Specialty.objects.all()
-  return http.to_json_response(
-      {"status": OK,
-       "specialties": map(_specialty_to_dictionary, specialties)})
+  return http.to_json_response({
+    "status": OK,
+    "specialties": map(_specialty_to_dictionary, specialties)})
 
-def on_health_worker_index(request):
+def on_mct_payroll_index(request):
+  """Get a list of ministry of tanzania payroll entries"""
+  mct_payroll_entries = models.MCTPayroll.objects
+  check = sb.util.safe(lambda: request.GET["check"])
+  offset = sb.util.safe(lambda: int(request.GET["offset"])) or 0
+  count = sb.util.safe(lambda: int(request.GET["count"])) or 100
+  if check:
+    mct_payroll_entries = mct_payroll_entries.filter(check_number=check)
+  mct_payroll_entries = mct_payroll_entries.all()
+  mct_payroll_entries = mct_payroll_entries[offset:count]
+  return http.to_json_response({
+    "status": OK,
+    "mct_payrolls": [{
+        "id": i.id,
+        "name": i.name,
+        "birthdate": i.birthdate,
+        "designation": i.designation,
+        "district": i.district,
+        "specialty_id": i.specialty_id,
+        "last_name": i.last_name,
+        "region_id": i.region_id,
+        "health_worker_id": i.health_worker_id,
+        "facility_id": i.facility_id,
+        "check_number": i.check_number}
+      for i in mct_payroll_entries]})
+
+def on_mct_registration_index(request):
   "Get information about a health worker"
   health_workers = models.MCTRegistration.objects
   num = request.GET.get("registration")
@@ -103,7 +135,7 @@ def on_region_index(request):
     val = request.GET.get(query_param)
     if val:
       regions = regions.filter(**{key: val})
-  regions = regions.prefetch_related('type').all()
+  regions = regions.prefetch_related("type").all()
   response = {
       "status": OK,
       "regions": map(_region_to_dictionary, regions)}
@@ -148,4 +180,137 @@ def on_facility_index(request):
       "status": OK,
       "facilities": map(_facility_to_dictionary, facilities)}
   return http.to_json_response(response)
+
+_address_pat = re.compile(u"^.{1,255}$")
+_email_pat = re.compile(u"^.+@.+$")
+_name_pat = re.compile(u"^.{1,255}$")
+
+def string_parser(pattern=None, required=False, min_length=None, max_length=None, strip=True):
+  def parser(value):
+    if value is None:
+      if required:
+        return None, ERROR_INVALID_INPUT
+      else:
+        return value, None
+    if not isinstance(value, unicode):
+      return None, ERROR_INVALID_INPUT
+    if strip:
+      value = value.strip()
+    if pattern is not None:
+      pat = re.compile(pattern) if isinstance(pattern, types.StringTypes) else pattern
+      if not pat.match(value):
+        return None, ERROR_INVALID_INPUT
+    if min_length is not None and len(value) < min_length:
+      return None, ERROR_INVALID_INPUT
+    if max_length is not None and len(value) > max_length:
+      return None, ERROR_INVALID_INPUT
+    return value, None
+  return parser
+
+def dictionary_parser(key_to_parser):
+  def parser(data):
+    if not data:
+      return None, {"status": ERROR_INVALID_INPUT, "key": None}
+    if not isinstance(data, dict):
+      return None, {"status": ERROR_INVALID_INPUT, "key": None}
+    result = {}
+    for key, parser in key_to_parser.items():
+      v = data.get(key)
+      v, status = parser(v)
+      if status:
+        return None, {"key": key, "status": status}
+      result[key] = v
+    return result, None
+  return parser
+
+def list_parser(parser, required=None):
+  def parser0(values):
+    if not isinstance(values, (list, tuple, type(None))):
+      return None, ERROR_INVALID_INPUT
+    if not values:
+      if not required:
+        return [], None
+      else:
+        return None, ERROR_INVALID_INPUT
+    result = []
+    for v in values:
+      parsed, status = parser(v)
+      if status:
+        return None, status
+      else:
+        result.append(parsed)
+    return result, None
+  return parser0
+
+def foreign_key_parser(model_class, required=None):
+  def parser(value):
+    if value is None:
+      if required:
+        return None, ERROR_INVALID_INPUT
+      else:
+        return None, None
+    try:
+      return model_class.objects.get(id=value), None
+    except model_class.DoesNotExist:
+      return None, ERROR_INVALID_INPUT
+  return parser
+
+def date_parser(required=None):
+  def parser(value):
+    if not isinstance(value, (dict, type(None))):
+      return None, ERROR_INVALID_INPUT
+    if not value:
+      if required:
+        return None, ERROR_INVALID_INPUT
+      else:
+        return None, None
+    result = sb.util.safe(lambda: datetime.date(value["year"], value["month"], value["day"]))
+    return result, None
+  return parser
+
+def parse_healthworker_input(data):
+  parser = dictionary_parser({
+    "address": string_parser(pattern="^.{0,255}$", required=False),
+    "birthdate": date_parser(required=False),
+    "country": string_parser(min_length=2, max_length=3, required=False),
+    "email": string_parser(pattern="^.+@.+$", required=False),
+    "facility": foreign_key_parser(models.Facility, required=False),
+    "gender": string_parser(pattern="^male|female$", required=True),
+    "name": string_parser(min_length=1),
+    "specialties": list_parser(foreign_key_parser(models.Specialty, required=False)),
+    "vodacom_phone": string_parser(required=False, max_length=255),
+    "other_phone": string_parser(required=False, max_length=255)})
+  return parser(data)
+
+def on_health_workers_save(request):
+  if not request.is_json:
+    return http.to_json_response({
+      "status": ERROR_INVALID_INPUT,
+      "message": "expecting JSON input"})
+  data, error = parse_healthworker_input(request.JSON)
+  if error:
+    return http.to_json_response({"status": error["status"], "key": error.get("key")})
+
+  with transaction.commit_on_success():
+    health_worker = models.HealthWorker()
+    health_worker.address = data["address"]
+    health_worker.birthdate = data["birthdate"]
+    health_worker.name = data["name"]
+    health_worker.country = data["country"]
+    health_worker.email = data["email"]
+    health_worker.facility = data["facility"]
+    for i in data["specialties"]:
+      health_worker.save()
+      health_worker.specialties.add(i)
+    health_worker.gender = data["gender"]
+    health_worker.other_phone = data["other_phone"]
+    health_worker.vodacom_phone = data["vodacom_phone"]
+    health_worker.save()
+  return http.to_json_response({"status": OK})
+
+def on_health_worker(request):
+  if request.method == "POST":
+    return on_health_workers_save(request)
+  else:
+    return http.not_found()
 

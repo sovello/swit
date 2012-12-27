@@ -4,6 +4,7 @@ import time
 
 from django import http
 
+import sb.util
 
 def _to_json_default(an_object):
   "JSON converter function to convert dates and datetimes to UTC timestamps"
@@ -33,3 +34,38 @@ def to_json_response(data, status=200):
   return http.HttpResponse(json.dumps(data, default=_to_json_default),
                       status=status,
                       content_type="application/json")
+
+
+def not_found():
+  "Return a not-found response"
+  return http.HttpResponse(status=404)
+
+def add_json_data(request):
+  content_type = request.META.get("CONTENT_TYPE", "")
+  request.JSON = {}
+  request.is_json = False
+  if content_type.lower() == "application/json":
+    request.JSON = sb.util.safe(lambda: json.loads(request.body))
+    if request.JSON is None:
+      request.JSON = {}
+    else:
+      request.is_json = True
+
+class JSONMiddleware(object):
+  def process_request(self, request):
+    add_json_data(request)
+
+  def process_view(self, request, view_func, view_args, view_kwargs):
+    pass
+
+  def process_response(self, request, response):
+    return response
+
+  def process_template_response(self, request, response):
+    return response
+
+  def process_exception(self, request, exception):
+    pass
+
+
+
