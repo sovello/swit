@@ -363,6 +363,7 @@ def parse_facility_input(data):
   parser = dictionary_parser({
     "title": string_parser(pattern="^.{1,255}$", required=True),
     "address": string_parser(pattern="^.{1,1000}$", required=False),
+    "type": foreign_key_parser(models.FacilityType, required=False),
     "region": foreign_key_parser(models.Region, required=False)})
   return parser(data)
 
