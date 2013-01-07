@@ -278,7 +278,6 @@ def parse_healthworker_input(data):
     "country": string_parser(min_length=2, max_length=3, required=False),
     "email": string_parser(pattern="^.+@.+$", required=False),
     "facility": foreign_key_parser(models.Facility, required=False),
-    "gender": string_parser(pattern="^male|female$", required=True),
     "name": string_parser(min_length=1),
     "specialties": list_parser(foreign_key_parser(models.Specialty, required=False)),
     "vodacom_phone": string_parser(required=False, max_length=255),
@@ -305,7 +304,6 @@ def on_health_workers_save(request):
     for i in data["specialties"]:
       health_worker.save()
       health_worker.specialties.add(i)
-    health_worker.gender = data["gender"]
     health_worker.other_phone = data["other_phone"]
     health_worker.vodacom_phone = data["vodacom_phone"]
     health_worker.save()
@@ -325,6 +323,5 @@ def on_facility_type_index(request):
                      for f in models.FacilityType.objects.all()]
   response = {"status": OK, "facility_types": facility_types}
   return http.to_json_response(response)
-
 
 
