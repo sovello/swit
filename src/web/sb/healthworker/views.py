@@ -20,7 +20,6 @@ OK = 0
 ERROR_INVALID_INPUT = -1
 ERROR_INVALID_PATTERN = -2
 
-
 def _specialty_to_dictionary(specialty):
   "Convert a Specialty to a dictionary suitable for JSON encoding"
   return {"created_at": specialty.created_at,
@@ -324,4 +323,32 @@ def on_facility_type_index(request):
   response = {"status": OK, "facility_types": facility_types}
   return http.to_json_response(response)
 
+def on_specialty(request):
+  if request.method != "POST":
+    return on_specialty_index(request)
+  else:
+    return on_specialty_create(request)
 
+def on_specialty_create(request):
+  if not request.is_json:
+    return http.to_json_response({
+      "status": ERROR_INVALID_INPUT,
+      "message": "expecting JSON input"})
+  data, error = parse_specialty_input(request.JSON)
+  if error:
+    return http.to_json_response({"status": error["status"], "key": error.get("key")})
+
+  with transaction.commit_on_success():
+    if list(models.Specialty.objects.filter(title=data["title"], parent_specialty=data["parent_specialty"]).all()):
+      return http.to_json_response({"status": ERROR_INVALID_INPUT})
+    specialty = models.Specialty()
+    specialty.title = data["title"]
+    specialty.parent_specialty = data["parent_specialty"]
+    specialty.save()
+  return http.to_json_response({"status": OK})
+
+def parse_specialty_input(data):
+  parser = dictionary_parser({
+    "title": string_parser(pattern="^.{1,255}$", required=False),
+    "parent_specialty": foreign_key_parser(models.Specialty, required=False)})
+  return parser(data)
