@@ -352,3 +352,38 @@ def parse_specialty_input(data):
     "title": string_parser(pattern="^.{1,255}$", required=False),
     "parent_specialty": foreign_key_parser(models.Specialty, required=False)})
   return parser(data)
+
+def on_facility(request):
+  if request.method != "POST":
+    return on_facility_index(request)
+  else:
+    return on_facility_create(request)
+
+def parse_facility_input(data):
+  parser = dictionary_parser({
+    "title": string_parser(pattern="^.{1,255}$", required=True),
+    "address": string_parser(pattern="^.{1,1000}$", required=False),
+    "region": foreign_key_parser(models.Region, required=False)})
+  return parser(data)
+
+def on_facility_create(request):
+  if not request.is_json:
+    return http.to_json_response({
+      "status": ERROR_INVALID_INPUT,
+      "message": "expecting JSON input"})
+  data, error = parse_facility_input(request.JSON)
+  if error:
+    return http.to_json_response({"status": error["status"], "key": error.get("key")})
+  with transaction.commit_on_success():
+    # skip adding facilities with exactly the same title, region
+    if list(models.Facility.objects.filter(title=data["title"],
+                                           address=data["address"],
+                                           region=data["region"]).all()):
+      return http.to_json_response({"status": ERROR_INVALID_INPUT})
+    facility = models.Facility()
+    facility.title = data["title"]
+    facility.address = data["address"]
+    facility.region = data["region"]
+    facility.save()
+    return http.to_json_response({"status": OK, "id": facility.id})
+
