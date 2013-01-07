@@ -317,3 +317,14 @@ def on_health_worker(request):
   else:
     return http.not_found()
 
+def on_facility_type_index(request):
+  facility_types = [{"id": f.id,
+                     "created_at": f.created_at,
+                     "updated_at": f.updated_at,
+                     "title": f.title}
+                     for f in models.FacilityType.objects.all()]
+  response = {"status": OK, "facility_types": facility_types}
+  return http.to_json_response(response)
+
+
+

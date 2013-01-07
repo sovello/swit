@@ -8,5 +8,6 @@ urlpatterns = patterns('',
   url('^mct-payrolls', 'sb.healthworker.views.on_mct_payroll_index'),
   url('^facilities', 'sb.healthworker.views.on_facility_index'),
   url('^health-workers', 'sb.healthworker.views.on_health_worker'),
+  url('^facility-types', 'sb.healthworker.views.on_facility_type_index'),
   url('^regions', 'sb.healthworker.views.on_region_index'))
 
