@@ -26,6 +26,7 @@ def _specialty_to_dictionary(specialty):
   return {"created_at": specialty.created_at,
           "updated_at": specialty.updated_at,
           "id": specialty.id,
+          "parent_specialty_id": specialty.parent_specialty_id,
           "abbreviation": specialty.abbreviation,
           "title": specialty.title}
 
