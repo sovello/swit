@@ -345,7 +345,7 @@ def on_specialty_create(request):
     specialty.title = data["title"]
     specialty.parent_specialty = data["parent_specialty"]
     specialty.save()
-  return http.to_json_response({"status": OK})
+    return http.to_json_response({"status": OK, "id": specialty.id})
 
 def parse_specialty_input(data):
   parser = dictionary_parser({
