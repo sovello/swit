@@ -277,7 +277,7 @@ def parse_healthworker_input(data):
     "country": string_parser(min_length=2, max_length=3, required=False),
     "email": string_parser(pattern="^.+@.+$", required=False),
     "facility": foreign_key_parser(models.Facility, required=False),
-    "language": string_parser(max_length=16, required=False)
+    "language": string_parser(max_length=16, required=False),
     "name": string_parser(min_length=1),
     "specialties": list_parser(foreign_key_parser(models.Specialty, required=False)),
     "vodacom_phone": string_parser(required=False, max_length=255),
