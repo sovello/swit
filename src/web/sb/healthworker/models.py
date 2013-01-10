@@ -9,7 +9,7 @@ class HealthWorker(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   email = models.EmailField(null=True, blank=True)
   facility = models.ForeignKey("Facility", null=True, blank=True, db_index=True)
-  gender = models.CharField(max_length=16, choices=[("male", "Male"), ("female", "Female")], null=True)
+  gender = models.CharField(max_length=16, choices=[("male", "Male"), ("female", "Female")], null=True, blank=True)
   name = models.CharField(max_length=255, null=False, blank=False)
   other_phone = models.CharField(max_length=255, null=True, blank=True)
   specialties = models.ManyToManyField("Specialty")
