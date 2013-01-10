@@ -277,9 +277,12 @@ def parse_healthworker_input(data):
     "country": string_parser(min_length=2, max_length=3, required=False),
     "email": string_parser(pattern="^.+@.+$", required=False),
     "facility": foreign_key_parser(models.Facility, required=False),
+    "language": string_parser(max_length=16, required=False)
     "name": string_parser(min_length=1),
     "specialties": list_parser(foreign_key_parser(models.Specialty, required=False)),
     "vodacom_phone": string_parser(required=False, max_length=255),
+    "mct_payroll": foreign_key_parser(models.MCTPayroll, required=False),
+    "mct_registration": foreign_key_parser(models.MCTRegistration, required=False),
     "other_phone": string_parser(required=False, max_length=255)})
   return parser(data)
 
@@ -305,7 +308,16 @@ def on_health_workers_save(request):
       health_worker.specialties.add(i)
     health_worker.other_phone = data["other_phone"]
     health_worker.vodacom_phone = data["vodacom_phone"]
+    health_worker.language = data["language"]
     health_worker.save()
+    if data["mct_registration"]:
+      if data["mct_registration"].health_worker is None:
+        data["mct_registration"].health_worker = health_worker
+        data["mct_registration"].save()
+    if data["mct_payroll"]:
+      if data["mct_payroll"].health_worker is None:
+        data["mct_payroll"].health_worker = health_worker
+        data["mct_payroll"].save()
   return http.to_json_response({"status": OK})
 
 def on_health_worker(request):
@@ -344,12 +356,15 @@ def on_specialty_create(request):
     specialty = models.Specialty()
     specialty.title = data["title"]
     specialty.parent_specialty = data["parent_specialty"]
+    specialty.msisdn = data["msisdn"]
+    specialty.is_user_submitted = True
     specialty.save()
     return http.to_json_response({"status": OK, "id": specialty.id})
 
 def parse_specialty_input(data):
   parser = dictionary_parser({
     "title": string_parser(pattern="^.{1,255}$", required=False),
+    "msisdn": string_parser(pattern="^.{1,255}$", required=False),
     "parent_specialty": foreign_key_parser(models.Specialty, required=False)})
   return parser(data)
 
@@ -363,6 +378,7 @@ def parse_facility_input(data):
   parser = dictionary_parser({
     "title": string_parser(pattern="^.{1,255}$", required=True),
     "address": string_parser(pattern="^.{1,1000}$", required=False),
+    "msisdn": string_parser(pattern="^.{1,255}$", required=False),
     "type": foreign_key_parser(models.FacilityType, required=False),
     "region": foreign_key_parser(models.Region, required=False)})
   return parser(data)
@@ -385,6 +401,8 @@ def on_facility_create(request):
     facility.title = data["title"]
     facility.address = data["address"]
     facility.region = data["region"]
+    facility.msisdn = data["msisdn"]
+    facility.is_user_submitted = True
     facility.save()
     return http.to_json_response({"status": OK, "id": facility.id})
 

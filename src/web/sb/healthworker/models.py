@@ -10,6 +10,7 @@ class HealthWorker(models.Model):
   email = models.EmailField(null=True, blank=True)
   facility = models.ForeignKey("Facility", null=True, blank=True, db_index=True)
   gender = models.CharField(max_length=16, choices=[("male", "Male"), ("female", "Female")], null=True, blank=True)
+  language = models.CharField(max_length=32, blank=True, null=True)
   name = models.CharField(max_length=255, null=False, blank=False)
   other_phone = models.CharField(max_length=255, null=True, blank=True)
   specialties = models.ManyToManyField("Specialty")
@@ -95,6 +96,8 @@ class Facility(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   type = models.ForeignKey(FacilityType, null=True, blank=False, db_index=True)
+  msisdn = models.CharField(max_length=255, blank=True, null=True)
+  is_user_submitted = models.NullBooleanField()
 
   def __unicode__(self):
     return self.title
@@ -111,6 +114,8 @@ class Specialty(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   parent_specialty = models.ForeignKey("Specialty", blank=True, null=True, db_index=True)
+  is_user_submitted = models.NullBooleanField()
+  msisdn = models.CharField(max_length=255, blank=True, null=True)
 
   def tree(self):
     curr = self
