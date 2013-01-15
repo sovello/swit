@@ -32,6 +32,7 @@ def _specialty_to_dictionary(specialty):
 def on_specialty_index(request):
   """Get a list of specialties"""
   specialties = models.Specialty.objects.all()
+  specialties = [i for i in specialties if not i.is_user_submitted]
   return http.to_json_response({
     "status": OK,
     "specialties": map(_specialty_to_dictionary, specialties)})
@@ -178,6 +179,7 @@ def on_facility_index(request):
     facilities = facilities.filter(region_id__in=region_ids)
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
+  facilities = filter(lambda f: not f.is_user_submitted, facilities)
   response = {
       "status": OK,
       "facilities": map(_facility_to_dictionary, facilities)}
