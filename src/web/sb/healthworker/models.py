@@ -49,10 +49,13 @@ class Region(models.Model):
     return self.title
 
   @classmethod
-  def get_or_create_region_by_title_type(cls, title, region_type_title, parent=None):
+  def get_or_create_region_by_title_type(cls, title, region_type_title, parent=None, filter_parent=True):
     region_type = get_or_create_by_title(RegionType, region_type_title)
     try:
-      return Region.objects.get(title__iexact=title, type=region_type, parent_region=parent)
+      if filter_parent:
+        return Region.objects.get(title__iexact=title, type=region_type, parent_region=parent)
+      else:
+        return Region.objects.get(title__iexact=title, type=region_type)
     except Region.DoesNotExist:
       region = Region()
       region.type = region_type

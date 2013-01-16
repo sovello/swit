@@ -1,140 +1,145 @@
-REGION,DISTRICT
-Arusha,Arusha DC
-,Arusha MC
-,Karatu DC
-,Longido DC
-,Meru DC
-,Monduli DC
-,Ngorongoro
-Arusha,Arusha DC
-,Arusha MC
-Dar es salaam,Ilala MC
-,Kinondoni MC
-,Temeke MC
-Dodoma,Bahi DC
-,Chamwino DC
-,Dodoma MC
-,Kondoa DC
-,Kongwa DC
-,Mpwapwa DC
-Iringa,Iringa DC
-,Iringa MC
-,Kilolo DC
-,Ludewa DC
-,Makete DC
-,Mufindi DC
-,Njombe DC
-,Njombe TC
-Kagera,Biharamulo DC
-,Bukoba DC
-,Bukoba MC
-,Chato DC
-,Karagwe DC
-,Misenyi
-,Muleba DC
-,Ngara DC
-Kigoma,Kasulu DC
-,Kibondo DC
-,Kigoma DC
-,Kigoma MC
-Kilimanjaro,Hai DC
-,Moshi DC
-,Moshi MC
-,Mwanga DC
-,Rombo DC
-,Same DC
-,Siha DC
-Lindi,Kilwa DC
-,Lindi DC
-,Lindi MC
-,Liwale DC
-,Nachingwea DC
-,Ruangwa DC
-Manyara Babati DC
-,Babati TC
-,Hanang' DC
-,Kiteto DC
-,Mbulu DC
-,Simanjiro DC
-Mara,Bunda DC
-,Musoma DC
-,Musoma MC
-,Rorya DC
-,Serengeti DC
-,Tarime DC
-Mbeya,Chunya DC
-,Ileje DC
-,Kyela DC
-,Mbarali DC
-,Mbeya CC
-,Mbeya DC
-,Mbozi DC
-,Rungwe DC
-Morogoro,Kilombero DC
-,Kilosa DC
-,Morogoro DC
-,Morogoro MC
-,Mvomero DC
-,Ulanga DC
-Mtwara,Masasi DC
-,Mtwara DC
-,Mtwara MC
-,Nanyumbu DC
-,Newala DC
-,Tandahimba DC
-Mwanza,Geita DC
-,Ilemela DC
-,Kwimba DC
-,Magu DC
-,Misungwi DC
-,Nyamagana DC
-,Sengerema DC
-,Ukerewe DC
-Pwani,Bagamoyo DC
-,Kibaha DC
-,Kibaha TC
-,Kisarawe DC
-,Mafia DC
-,Mkuranga DC
-,Rufiji DC
-Rukwa,Mpanda DC
-,Mpanda TC
-,Nkasi DC
-,Sumbawanga DC
-,Sumbawanga MC
-Ruvuma,Mbinga DC
-,Namtumbo DC
-,Songea DC
-,Songea MC
-,Tunduru DC
-Shinyanga,Bariadi DC
-,Bukombe DC
-,Kahama DC
-,Kishapu DC
-,Maswa DC
-,Meatu DC
-,Shinyanga DC
-,Shinyanga MC
-Singida Iramba DC
-,Manyoni DC
-,Singida DC
-,Singida MC
-Tabora,Igunga
-,Igunga
-,Nzega
-,Nzega
-,Sikonge
-,Sikonge
-,Tabora MC
-,Urambo
-,Urambo
-,Uyui
-,Uyui
-Tanga,Handeni DC
-,Kilindi DC
-,Korogwe DC
-,Korogwe TC
-,Lushoto DC
-,Mkinga DC
-,Muheza DC
-,Pangani DC
+REGION	DISTRICT	Comment	Required Edit	Required Edit	Facility 2009 List comparison
+Arusha	Arusha DC	There is only 1 "arusha district" in new district list. However, both DC and MC have assigned facilities			Has assigned facilities
+Arusha	Arusha MC	There is only 1 "arusha district" in new district list. However, both DC and MC have assigned facilities			Has assigned facilities
+Arusha	Karatu DC				Has assigned facilities
+Arusha	Longido DC				Has assigned facilities
+Arusha	Meru DC	Is this the same as Arumeru District? Is one way more correct than another?			Has assigned facilities
+Arusha	Monduli DC				Has assigned facilities
+Arusha	Ngorongoro	TYPO? A.K.A. Ngonrongo DC	Ngonrongo DC		Has assigned facilities
+Dar es salaam	Ilala MC				NO assigned facilities
+Dar es salaam	Kinondoni MC				NO assigned facilities
+Dar es salaam	Temeke MC				NO assigned facilities
+Dodoma	Bahi DC				Has assigned facilities
+Dodoma	Chamwino DC				Has assigned facilities
+Dodoma	Dodoma MC				Has assigned facilities
+Dodoma	Kondoa DC				Has assigned facilities
+Dodoma	Kongwa DC				Has assigned facilities
+Dodoma	Mpwapwa DC				Has assigned facilities
+Iringa	Iringa DC				Has assigned facilities
+Iringa	Iringa MC				Has assigned facilities
+Iringa	Kilolo DC				Has assigned facilities
+Iringa	Ludewa DC	Ludewa DC may switch to new Njombe Region			Has assigned facilities
+Iringa	Makete DC	Makete may switch to new Njombe Region			Has assigned facilities
+Iringa	Mufindi DC				Has assigned facilities
+Iringa	Njombe DC	Njombe may switch to new Njombe Region			Has assigned facilities
+Iringa	Njombe TC	Njombe may switch to new Njombe Region			Has assigned facilities
+Kagera	Biharamulo DC				Has assigned facilities
+Kagera	Bukoba DC				Has assigned facilities
+Kagera	Bukoba MC				Has assigned facilities
+Kagera	Chato DC	Chato DC may switch to new  Geita Region			Has assigned facilities
+Kagera	Karagwe DC				Has assigned facilities
+Kagera	Misenyi				Has assigned facilities
+Kagera	Muleba DC				Has assigned facilities
+Kagera	Ngara DC				Has assigned facilities
+Kigoma	Kasulu DC				Has assigned facilities
+Kigoma	Kibondo DC				Has assigned facilities
+Kigoma	Kigoma DC				Has assigned facilities
+Kigoma	Kigoma MC				Has assigned facilities
+Kilimanjaro	Hai DC				Has assigned facilities
+Kilimanjaro	Moshi DC				Has assigned facilities
+Kilimanjaro	Moshi MC				Has assigned facilities
+Kilimanjaro	Mwanga DC				Has assigned facilities
+Kilimanjaro	Rombo DC				Has assigned facilities
+Kilimanjaro	Same DC				Has assigned facilities
+Kilimanjaro	Siha DC				Has assigned facilities
+Lindi	Kilwa DC				Has assigned facilities
+Lindi	Lindi DC				Has assigned facilities
+Lindi	Lindi MC	A.K.A. Lindi Urban MC	Lindi Urban MC		Has assigned facilities
+Lindi	Liwale DC				Has assigned facilities
+Lindi	Nachingwea DC				Has assigned facilities
+Lindi	Ruangwa DC				Has assigned facilities
+Manyara	Babati TC	Typo. Region and District were mistakenly combined	Region: Manyara	District: Babati DC	Has assigned facilities
+Manyara	Hanang' DC	Typo with the '	Hanang DC		Has assigned facilities
+Manyara	Kiteto DC				Has assigned facilities
+Manyara	Mbulu DC				Has assigned facilities
+Manyara	Simanjiro DC				Has assigned facilities
+Mara	Bunda DC				Has assigned facilities
+Mara	Musoma DC				Has assigned facilities
+Mara	Musoma MC				Has assigned facilities
+Mara	Rorya DC				Has assigned facilities
+Mara	Serengeti DC				Has assigned facilities
+Mara	Tarime DC				Has assigned facilities
+Mbeya	Chunya DC				Has assigned facilities
+Mbeya	Ileje DC				Has assigned facilities
+Mbeya	Kyela DC				Has assigned facilities
+Mbeya	Mbarali DC	Typo?? Mbalali DC 	Mbalali DC		Has assigned facilities
+Mbeya	Mbeya CC	Typo replace CC with MC	Mbeya MC		Has assigned facilities
+Mbeya	Mbeya DC				Has assigned facilities
+Mbeya	Mbozi DC				Has assigned facilities
+Mbeya	Rungwe DC				Has assigned facilities
+Morogoro	Kilombero DC				Has assigned facilities
+Morogoro	Kilosa DC				Has assigned facilities
+Morogoro	Morogoro DC				Has assigned facilities
+Morogoro	Morogoro MC				Has assigned facilities
+Morogoro	Mvomero DC				Has assigned facilities
+Morogoro	Ulanga DC				Has assigned facilities
+Mtwara	Masasi DC				Has assigned facilities
+Mtwara	Mtwara DC				Has assigned facilities
+Mtwara	Mtwara MC				Has assigned facilities
+Mtwara	Nanyumbu DC				Has assigned facilities
+Mtwara	Newala DC				Has assigned facilities
+Mtwara	Tandahimba DC				Has assigned facilities
+Mtwara	Lulindi	NEW DISTRICT			NO assigned facilities
+Mwanza	Geita DC	Geita DC may switch to new Geita Region			Has assigned facilities
+Mwanza	Ilemela DC				Has assigned facilities
+Mwanza	Kwimba DC				Has assigned facilities
+Mwanza	Magu DC				Has assigned facilities
+Mwanza	Misungwi DC				Has assigned facilities
+Mwanza	Nyamagana DC				Has assigned facilities
+Mwanza	Sengerema DC				Has assigned facilities
+Mwanza	Ukerewe DC				Has assigned facilities
+Pwani	Bagamoyo DC				Has assigned facilities
+Pwani	Kibaha DC				Has assigned facilities
+Pwani	Kibaha TC				Has assigned facilities
+Pwani	Kisarawe DC				Has assigned facilities
+Pwani	Mafia DC				Has assigned facilities
+Pwani	Mkuranga DC				Has assigned facilities
+Pwani	Rufiji DC				NO assigned facilities
+Rukwa	Mpanda DC	Mpanda (DC or TC?) may switch to new Katavi Region			Has assigned facilities
+Rukwa	Mpanda TC	Mpanda (DC or TC?) may switch to new Katavi Region			Has assigned facilities
+Rukwa	Nkasi DC				Has assigned facilities
+Rukwa	Sumbawanga DC				Has assigned facilities
+Rukwa	Sumbawanga MC				Has assigned facilities
+Ruvuma	Mbinga DC				Has assigned facilities
+Ruvuma	Namtumbo DC				Has assigned facilities
+Ruvuma	Songea DC				Has assigned facilities
+Ruvuma	Songea MC				Has assigned facilities
+Ruvuma	Tunduru DC				Has assigned facilities
+Ruvuma	Nyasa	NEW District!			NO assigned facilities
+Shinyanga	Bariadi DC	Bariadi May switch to new Simiyu Region			Has assigned facilities
+Shinyanga	Bukombe DC	Bukombe May switch to new Geita Region			Has assigned facilities
+Shinyanga	Kahama DC				Has assigned facilities
+Shinyanga	Kishapu DC				Has assigned facilities
+Shinyanga	Maswa DC	Maswa May switch to new Simiyu Region			Has assigned facilities
+Shinyanga	Meatu DC	Meatu May switch to new Simiyu Region			Has assigned facilities
+Shinyanga	Shinyanga DC				Has assigned facilities
+Shinyanga	Shinyanga MC				Has assigned facilities
+Singida	Iramba DC	Typo. Region and District were mistakenly combined	Region: Singida	District: Iramba DC	Has assigned facilities
+Singida	Manyoni DC				Has assigned facilities
+Singida	Singida DC				Has assigned facilities
+Singida	Singida MC				Has assigned facilities
+Tabora	Igunga				Has assigned facilities
+Tabora	Igunga	Duplicate, Remove			
+Tabora	Nzega				Has assigned facilities
+Tabora	Nzega	Duplicate, Remove			
+Tabora	Sikonge				Has assigned facilities
+Tabora	Sikonge	Duplicate, Remove			
+Tabora	Tabora MC				Has assigned facilities
+Tabora	Urambo				Has assigned facilities
+Tabora	Urambo	Duplicate, Remove			
+Tabora	Uyui				NO assigned facilities
+Tabora	Uyui	Duplicate, Remove			
+Tanga	Handeni DC				Has assigned facilities
+Tanga	Kilindi DC				Has assigned facilities
+Tanga	Korogwe DC				Has assigned facilities
+Tanga	Korogwe TC				Has assigned facilities
+Tanga	Lushoto DC				Has assigned facilities
+Tanga	Mkinga DC				Has assigned facilities
+Tanga	Muheza DC				Has assigned facilities
+Tanga	Pangani DC				Has assigned facilities
+Tanga	Tanga City	ADD, was missing			Has assigned facilities
+Katavi	Mlele	NEW!			NO assigned facilities
+Simiyu	Busega	NEW!			NO assigned facilities
+Simiyu	Itilima	NEW!			NO assigned facilities
+Njombe	Wanging'ombe	NEW!			NO assigned facilities
+Tabora	Tabora DC	ADD, was missing; Is it in Tabora Region?			Has assigned facilities

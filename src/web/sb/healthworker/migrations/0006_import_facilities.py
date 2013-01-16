@@ -22,7 +22,6 @@ def import_facility(f):
   facility.save()
   print "added ", facility
 
-
 def import_facilities():
   fields = []
   facilities_txt = os.path.join(
