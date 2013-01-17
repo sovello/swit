@@ -118,6 +118,7 @@ class Specialty(models.Model):
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   parent_specialty = models.ForeignKey("Specialty", blank=True, null=True, db_index=True)
   is_user_submitted = models.NullBooleanField()
+  is_query_subspecialties = models.BooleanField(default=False, blank=True)
   msisdn = models.CharField(max_length=255, blank=True, null=True)
 
   def tree(self):

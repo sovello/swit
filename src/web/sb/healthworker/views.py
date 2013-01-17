@@ -177,6 +177,10 @@ def on_facility_index(request):
       region_ids.add(region.id)
       region_ids.update(region.subregion_ids())
     facilities = facilities.filter(region_id__in=region_ids)
+  facility_type = request.GET.get("type")
+  if facility_type:
+    facilities = facilities.filter(type__title__iexact=facility_type)
+
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
   facilities = filter(lambda f: not f.is_user_submitted, facilities)
@@ -280,7 +284,7 @@ def parse_healthworker_input(data):
     "email": string_parser(pattern="^.+@.+$", required=False),
     "facility": foreign_key_parser(models.Facility, required=False),
     "language": string_parser(max_length=16, required=False),
-    "name": string_parser(min_length=1),
+    "name": string_parser(min_length=1, required=True),
     "specialties": list_parser(foreign_key_parser(models.Specialty, required=False)),
     "vodacom_phone": string_parser(required=False, max_length=255),
     "mct_payroll": foreign_key_parser(models.MCTPayroll, required=False),
