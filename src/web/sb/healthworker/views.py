@@ -28,13 +28,19 @@ def _specialty_to_dictionary(specialty):
           "updated_at": specialty.updated_at,
           "id": specialty.id,
           "parent_specialty_id": specialty.parent_specialty_id,
+          "is_query_subspecialties": specialty.is_query_subspecialties,
           "abbreviation": specialty.abbreviation,
+          "msisdn": specialty.msisdn,
+          "is_user_submitted": specialty.is_user_submitted,
           "title": specialty.title}
 
 def on_specialty_index(request):
   """Get a list of specialties"""
   specialties = models.Specialty.objects.all()
+
+  # Filter out user submitted specialties:
   specialties = [i for i in specialties if not i.is_user_submitted]
+
   return http.to_json_response({
     "status": OK,
     "specialties": map(_specialty_to_dictionary, specialties)})
