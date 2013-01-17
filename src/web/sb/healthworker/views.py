@@ -177,9 +177,9 @@ def on_facility_index(request):
       region_ids.add(region.id)
       region_ids.update(region.subregion_ids())
     facilities = facilities.filter(region_id__in=region_ids)
-  facility_type = request.GET.get("type")
+  facility_type = sb.util.safe(lambda:int(request.GET["type"]))
   if facility_type:
-    facilities = facilities.filter(type__title__iexact=facility_type)
+    facilities = facilities.filter(type_id=facility_type)
 
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
