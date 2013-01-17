@@ -156,8 +156,9 @@ def on_region_index(request):
       regions = regions.filter(**{key: val})
   title = request.GET.get("title")
   if title:
-    regions = edit_search(regions, "title", title)
+    regions = edit_search(regions, "healthworker_region.title", title)
   regions = regions.prefetch_related("type").all()
+
   response = {
       "status": OK,
       "regions": map(_region_to_dictionary, regions)}
