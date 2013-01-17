@@ -20,6 +20,8 @@ OK = 0
 ERROR_INVALID_INPUT = -1
 ERROR_INVALID_PATTERN = -2
 
+MAX_EDIT_DISTANCE = 2
+
 def _specialty_to_dictionary(specialty):
   "Convert a Specialty to a dictionary suitable for JSON encoding"
   return {"created_at": specialty.created_at,
@@ -133,11 +135,15 @@ def on_region_index(request):
   regions = models.Region.objects
   for (query_param, key) in [
       ("parent_region_id", "parent_region_id"),
-      ("type", "type__title__iexact"),
-      ("title", "title__istartswith")]:
+      ("type", "type__title__iexact")]:
     val = request.GET.get(query_param)
     if val:
       regions = regions.filter(**{key: val})
+  title = request.GET.get("title")
+  if title:
+    where = ["edit_search(%%s, title, %d)" % (MAX_EDIT_DISTANCE, )]
+    where_params = [title]
+    regions = regions.extra(where=where, params=where_params)
   regions = regions.prefetch_related("type").all()
   response = {
       "status": OK,
@@ -162,9 +168,6 @@ def _facility_to_dictionary(facility):
 
 def on_facility_index(request):
   facilities = models.Facility.objects
-  title = request.GET.get("title")
-  if title:
-    facilities = facilities.filter(title__istartswith=title)
   region_id = request.GET.get("region")
   if region_id:
     # compute subregions here.
@@ -180,6 +183,12 @@ def on_facility_index(request):
   facility_type = sb.util.safe(lambda:int(request.GET["type"]))
   if facility_type:
     facilities = facilities.filter(type_id=facility_type)
+
+  title = request.GET.get("title")
+  if title:
+    where = ["edit_search(%%s, title, %d)" % (MAX_EDIT_DISTANCE, )]
+    where_params = [title]
+    facilities = facilities.extra(where=where, params=where_params)
 
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
