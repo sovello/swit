@@ -47,6 +47,10 @@ def on_mct_payroll_index(request):
   count = sb.util.safe(lambda: int(request.GET["count"])) or 100
   if check:
     mct_payroll_entries = mct_payroll_entries.filter(check_number=check)
+  name = request.GET.get("name")
+  if name is not None:
+    mct_payroll_entries = edit_search(mct_payroll_entries, "name", name)
+
   mct_payroll_entries = mct_payroll_entries.all()
   mct_payroll_entries = list(mct_payroll_entries)
   total = len(mct_payroll_entries)
@@ -72,14 +76,14 @@ def on_mct_registration_index(request):
   "Get information about a health worker"
   health_workers = models.MCTRegistration.objects
   num = request.GET.get("registration")
-  name = request.GET.get("name")
   count = sb.util.safe(lambda:int(request.GET["count"])) or 100
   offset = sb.util.safe(lambda:int(request.GET["offset"])) or 0
   if num:
     health_workers = health_workers.filter(registration_number=num)
-  if name:
-    # FIXME: do levenshtein
-    health_workers = health_workers.filter(name__istartswith=name)
+
+  name = request.GET.get("name")
+  if name is not None:
+    health_workers = edit_search(health_workers, "name", name)
 
   health_workers = list(health_workers.all())
   total = len(health_workers)
@@ -131,6 +135,11 @@ def _region_to_dictionary(region):
         "created_at": region.created_at,
         "updated_at": region.updated_at}
 
+def edit_search(query_set, field, value):
+  where = ["edit_search(%%s, %s, %d)" % (field, MAX_EDIT_DISTANCE, )]
+  where_params = [value]
+  return query_set.extra(where=where, params=where_params)
+
 def on_region_index(request):
   regions = models.Region.objects
   for (query_param, key) in [
@@ -141,9 +150,7 @@ def on_region_index(request):
       regions = regions.filter(**{key: val})
   title = request.GET.get("title")
   if title:
-    where = ["edit_search(%%s, title, %d)" % (MAX_EDIT_DISTANCE, )]
-    where_params = [title]
-    regions = regions.extra(where=where, params=where_params)
+    regions = edit_search(regions, "title", title)
   regions = regions.prefetch_related("type").all()
   response = {
       "status": OK,
@@ -186,9 +193,7 @@ def on_facility_index(request):
 
   title = request.GET.get("title")
   if title:
-    where = ["edit_search(%%s, title, %d)" % (MAX_EDIT_DISTANCE, )]
-    where_params = [title]
-    facilities = facilities.extra(where=where, params=where_params)
+    facilities = edit_search(facilities, "title", title)
 
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
