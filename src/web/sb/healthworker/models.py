@@ -12,10 +12,13 @@ class HealthWorker(models.Model):
   gender = models.CharField(max_length=16, choices=[("male", "Male"), ("female", "Female")], null=True, blank=True)
   language = models.CharField(max_length=32, blank=True, null=True)
   name = models.CharField(max_length=255, null=False, blank=False)
+  surname = models.CharField(null=True, max_length=128, blank=True)
   other_phone = models.CharField(max_length=255, null=True, blank=True)
   specialties = models.ManyToManyField("Specialty")
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
+  mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
+  mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
 
   # This improves the Django admin view:
   def __unicode__(self):
