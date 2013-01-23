@@ -104,6 +104,15 @@ class Facility(models.Model):
   type = models.ForeignKey(FacilityType, null=True, blank=False, db_index=True)
   msisdn = models.CharField(max_length=255, blank=True, null=True)
   is_user_submitted = models.NullBooleanField()
+  latitude = models.FloatField(null=True, blank=True)
+  longitude = models.FloatField(null=True, blank=True)
+  alternative_names = models.CharField(max_length=255, null=True, blank=True)
+  status = models.CharField(max_length=255, null=True, blank=True)
+  hmis = models.CharField(max_length=255, null=True, blank=True)
+  remarks = models.CharField(max_length=255, null=True, blank=True)
+  registration_num = models.CharField(max_length=255, null=True, blank=True)
+  source = models.CharField(max_length=255, null=True, blank=True)
+  current_id = models.CharField(max_length=255, null=True, blank=True)
 
   def __unicode__(self):
     return self.title
