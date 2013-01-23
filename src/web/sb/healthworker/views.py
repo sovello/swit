@@ -308,8 +308,9 @@ def parse_healthworker_input(data):
     "name": string_parser(min_length=1, required=True),
     "specialties": list_parser(foreign_key_parser(models.Specialty, required=False)),
     "vodacom_phone": string_parser(required=False, max_length=255),
-    "mct_payroll": foreign_key_parser(models.MCTPayroll, required=False),
-    "mct_registration": foreign_key_parser(models.MCTRegistration, required=False),
+    "surname": string_parser(required=False, max_length=255),
+    "mct_registration_number": string_parser(required=False, max_length=255),
+    "mct_payroll_number": string_parser(required=False, max_length=255),
     "other_phone": string_parser(required=False, max_length=255)})
   return parser(data)
 
@@ -336,16 +337,11 @@ def on_health_workers_save(request):
     health_worker.other_phone = data["other_phone"]
     health_worker.vodacom_phone = data["vodacom_phone"]
     health_worker.language = data["language"]
+    health_worker.mct_registration_num = data["mct_registration_number"]
+    health_worker.mct_payroll_num = data["mct_payroll_number"]
+    health_worker.surname = data["surname"]
     health_worker.save()
-    if data["mct_registration"]:
-      if data["mct_registration"].health_worker is None:
-        data["mct_registration"].health_worker = health_worker
-        data["mct_registration"].save()
-    if data["mct_payroll"]:
-      if data["mct_payroll"].health_worker is None:
-        data["mct_payroll"].health_worker = health_worker
-        data["mct_payroll"].save()
-  return http.to_json_response({"status": OK})
+    return http.to_json_response({"status": OK, "id": health_worker.id})
 
 def on_health_worker(request):
   if request.method == "POST":
