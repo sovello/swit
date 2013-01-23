@@ -419,11 +419,6 @@ def on_facility_create(request):
   if error:
     return http.to_json_response({"status": error["status"], "key": error.get("key")})
   with transaction.commit_on_success():
-    # skip adding facilities with exactly the same title, region
-    if list(models.Facility.objects.filter(title=data["title"],
-                                           address=data["address"],
-                                           region=data["region"]).all()):
-      return http.to_json_response({"status": ERROR_INVALID_INPUT})
     facility = models.Facility()
     facility.title = data["title"]
     facility.address = data["address"]
