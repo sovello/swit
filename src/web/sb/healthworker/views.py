@@ -357,11 +357,37 @@ def on_health_workers_save(request):
     health_worker.save()
     return http.to_json_response({"status": OK, "id": health_worker.id})
 
+
+def on_health_workers_index(request):
+  """Get an index of health care workers"""
+  health_workers = models.HealthWorker.objects.all()
+  health_workers = health_workers.prefetch_related("specialties", "facility").all()
+  return http.to_json_response(
+    {"status": OK,
+     "health_workers": [
+       {"id": i.id,
+        "name": i.name,
+        "vodacom_phone": i.vodacom_phone,
+        "created_at": i.created_at,
+        "updated_at": i.updated_at,
+        "language": i.language,
+        "mct_registration_num": i.mct_registration_num,
+        "mct_payroll_num": i.mct_payroll_num,
+        "verification_state": i.verification_state,
+        "email": i.email,
+        "birthdate": i.birthdate,
+        "address": i.address,
+        "other_phone": i.other_phone,
+        "specialties": [s.id for s in i.specialties.all()],
+        "facility": i.facility_id}
+       for i in health_workers]})
+
 def on_health_worker(request):
   if request.method == "POST":
     return on_health_workers_save(request)
   else:
-    return http.not_found()
+    return on_health_workers_index(request)
+
 
 def on_facility_type_index(request):
   facility_types = [{"id": f.id,
