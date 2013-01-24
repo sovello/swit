@@ -367,6 +367,7 @@ def on_health_workers_index(request):
      "health_workers": [
        {"id": i.id,
         "name": i.name,
+        "country": i.country,
         "vodacom_phone": i.vodacom_phone,
         "created_at": i.created_at,
         "updated_at": i.updated_at,
