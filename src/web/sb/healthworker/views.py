@@ -334,6 +334,8 @@ def on_health_workers_save(request):
     #  return http.to_json_response({"status": ERROR_INVALID_INPUT, "key": "vodacom_phone"})
     #if models.HealthWorker.objects.filter(mct_payroll_num=data["mct_payroll_number"]).count() > 0:
     #  return http.to_json_response({"status": ERROR_INVALID_INPUT, "key": "mct_payroll_number"})
+    #if models.HealthWorker.objects.filter(mct_registration_num=data["mct_registration_num"], surname=data["surname"]).count() > 0:
+    #  return http.to_json_response({"status": ERROR_INVALID_INPUT, "key": "mct_registration_num"})
     health_worker = models.HealthWorker()
     health_worker.address = data["address"]
     health_worker.birthdate = data["birthdate"]
