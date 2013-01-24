@@ -50,8 +50,7 @@ def import_facility(f):
 
 def import_facilities():
   facilities_txt = os.path.join(os.path.split(__file__)[0], 'facilities-01-18-2013.txt')
-  for item in list(read_tsv(facilities_txt))[:500]:
-    #if item.get('name'):
+  for item in read_tsv(facilities_txt):
     import_facility(item)
 
 def delete_regions():
