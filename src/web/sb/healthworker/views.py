@@ -222,7 +222,7 @@ def on_facility_index(request):
   facilities = facilities.all()
   facilities = filter(lambda f: not f.is_user_submitted, facilities)
   facilities = list(facilities)
-  facilities.sort(key=lambda i:(sys.intmax - i.type.priority, i.title))
+  facilities.sort(key=lambda i:(sys.maxint - i.type.priority, i.title))
   response = {
       "status": OK,
       "facilities": map(_facility_to_dictionary, facilities)}
