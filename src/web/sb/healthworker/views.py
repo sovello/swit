@@ -324,9 +324,10 @@ def on_health_workers_save(request):
     return http.to_json_response({"status": error["status"], "key": error.get("key")})
 
   with transaction.commit_on_success():
-    #if data["vodacom_phone"]:
-    #  if list(models.HealthWorker.objects.filter(vodacom_phone=data["vodacom_phone"]).all()):
-    #    return http.to_json_response({"status": ERROR_INVALID_INPUT, "key": "vodacom_phone"})
+    #if models.HealthWorker.objects.filter(vodacom_phone=data["vodacom_phone"]).count() > 0:
+    #  return http.to_json_response({"status": ERROR_INVALID_INPUT, "key": "vodacom_phone"})
+    #if models.HealthWorker.objects.filter(mct_payroll_num=data["mct_payroll_number"]).count() > 0:
+    #  return http.to_json_response({"status": ERROR_INVALID_INPUT, "key": "mct_payroll_number"})
     health_worker = models.HealthWorker()
     health_worker.address = data["address"]
     health_worker.birthdate = data["birthdate"]
