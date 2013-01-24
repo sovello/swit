@@ -19,6 +19,46 @@ class HealthWorker(models.Model):
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
+  UNVERIFIED = 0
+  MCT_PAYROLL_VERIFIED = 1
+  MCT_REGISTRATION_VERIFIED = 2
+  MANUALLY_VERIFIED = 3
+
+  verification_state = models.IntegerField(default=0,
+                                           null=False,
+                                           blank=True,
+                                           choices=[(UNVERIFIED, u"Needs Verification"),
+                                                    (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number"),
+                                                    (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
+                                                    (MANUALLY_VERIFIED, u"Manually Verified")])
+
+  def auto_verify(self):
+    if self.verification_state != self.UNVERIFIED:
+      return
+    if self.mct_payroll_num:
+      payrolls = list(MCTPayroll.objects.filter(check_number=self.mct_payroll_num).all())
+      if (payrolls
+          and (not any(((p.health_worker_id != None)
+                         and (p.healthworker_id != self.id))
+                       for p in payrolls))):
+        for p in payrolls:
+          p.health_worker = self
+          p.save()
+        self.verification_state = self.MCT_PAYROLL_VERIFIED
+        self.save()
+    if self.surname and self.mct_registration_num:
+      regs = MCTRegistration.objects
+      regs = regs.filter(registration_number=self.mct_registration_num)
+      where = ["edit_search(%s, name, 1)"]
+      where_params = [self.surname]
+      regs = regs.extra(where=where, params=where_params)
+      regs = list(regs.all())
+      if (regs and not any((r.health_worker_id is not None and r.health_worker_id != self.id) for r in regs)):
+        for r in regs:
+          r.health_worker = self
+          r.save()
+          self.verification_state = self.MCT_REGISTRATION_VERIFIED
+          self.save()
 
   # This improves the Django admin view:
   def __unicode__(self):

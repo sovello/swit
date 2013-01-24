@@ -353,6 +353,8 @@ def on_health_workers_save(request):
     health_worker.mct_payroll_num = data["mct_payroll_number"]
     health_worker.surname = data["surname"]
     health_worker.save()
+    health_worker.auto_verify()
+    health_worker.save()
     return http.to_json_response({"status": OK, "id": health_worker.id})
 
 def on_health_worker(request):
