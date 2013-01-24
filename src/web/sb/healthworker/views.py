@@ -15,6 +15,8 @@ from django.db import transaction
 from sb import http
 from sb.healthworker import models
 import sb.util
+import sys
+
 
 OK = 0
 ERROR_INVALID_INPUT = -1
@@ -33,6 +35,7 @@ def _specialty_to_dictionary(specialty):
           "msisdn": specialty.msisdn,
           "is_user_submitted": specialty.is_user_submitted,
           "short_title": specialty.short_title,
+          "priority": specialty.priority,
           "title": specialty.title}
 
 def on_specialty_index(request):
@@ -41,7 +44,7 @@ def on_specialty_index(request):
 
   # Filter out user submitted specialties:
   specialties = [i for i in specialties if not i.is_user_submitted]
-
+  specialties.sort(key=lambda i: ((sys.maxint - i.priority), i.title))
   return http.to_json_response({
     "status": OK,
     "specialties": map(_specialty_to_dictionary, specialties)})

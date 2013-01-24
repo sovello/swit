@@ -133,6 +133,7 @@ class Specialty(models.Model):
   is_query_subspecialties = models.BooleanField(default=False, blank=True)
   msisdn = models.CharField(max_length=255, blank=True, null=True)
   short_title = models.CharField(max_length=255, null=True, blank=True)
+  priority = models.IntegerField(default=0, null=False, blank=True)
 
   def tree(self):
     curr = self
