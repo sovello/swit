@@ -209,6 +209,8 @@ def on_facility_index(request):
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
   facilities = filter(lambda f: not f.is_user_submitted, facilities)
+  facilities = list(facilities)
+  facilities.sort(key=lambda i:(sys.intmax - i.type.priority, i.title))
   response = {
       "status": OK,
       "facilities": map(_facility_to_dictionary, facilities)}
@@ -361,6 +363,7 @@ def on_facility_type_index(request):
   facility_types = [{"id": f.id,
                      "created_at": f.created_at,
                      "updated_at": f.updated_at,
+                     "priority": f.priority,
                      "title": f.title}
                      for f in models.FacilityType.objects.all()]
   response = {"status": OK, "facility_types": facility_types}

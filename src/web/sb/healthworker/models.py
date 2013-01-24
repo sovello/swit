@@ -81,6 +81,7 @@ class FacilityType(models.Model):
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  priority = models.IntegerField(null=False, default=0, blank=True)
 
   def __unicode__(self):
     return self.title
