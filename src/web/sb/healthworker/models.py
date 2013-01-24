@@ -19,6 +19,7 @@ class HealthWorker(models.Model):
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
+
   UNVERIFIED = 0
   MCT_PAYROLL_VERIFIED = 1
   MCT_REGISTRATION_VERIFIED = 2

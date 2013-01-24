@@ -150,6 +150,18 @@ def edit_search(query_set, field, value):
   where_params = [value]
   return query_set.extra(where=where, params=where_params)
 
+def on_region_type_index(request):
+  return http.to_json_response({
+    "status": OK,
+    "region_types": [
+      {"title": r.title,
+       "created_at": r.created_at,
+       "updated_at": r.updated_at,
+       "id": r.id} for r in models.RegionType.objects.all()
+    ]})
+
+
+
 def on_region_index(request):
   regions = models.Region.objects
   for (query_param, key) in [

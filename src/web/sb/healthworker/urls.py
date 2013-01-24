@@ -9,5 +9,6 @@ urlpatterns = patterns('',
   url('^facilities', 'sb.healthworker.views.on_facility'),
   url('^health-workers', 'sb.healthworker.views.on_health_worker'),
   url('^facility-types', 'sb.healthworker.views.on_facility_type_index'),
+  url('^region-types', 'sb.healthworker.views.on_region_type_index'),
   url('^regions', 'sb.healthworker.views.on_region_index'))
 
