@@ -132,6 +132,7 @@ class Specialty(models.Model):
   is_user_submitted = models.NullBooleanField()
   is_query_subspecialties = models.BooleanField(default=False, blank=True)
   msisdn = models.CharField(max_length=255, blank=True, null=True)
+  short_title = models.CharField(max_length=255, null=True, blank=True)
 
   def tree(self):
     curr = self

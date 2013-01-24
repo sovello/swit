@@ -32,6 +32,7 @@ def _specialty_to_dictionary(specialty):
           "abbreviation": specialty.abbreviation,
           "msisdn": specialty.msisdn,
           "is_user_submitted": specialty.is_user_submitted,
+          "short_title": specialty.short_title,
           "title": specialty.title}
 
 def on_specialty_index(request):
