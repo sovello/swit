@@ -409,6 +409,7 @@ def on_facility_type_index(request):
                      "priority": f.priority,
                      "title": f.title}
                      for f in models.FacilityType.objects.all()]
+  facility_types.sort(key=lambda i: (sys.maxint - i['priority'], i['title']))
   response = {"status": OK, "facility_types": facility_types}
   return http.to_json_response(response)
 

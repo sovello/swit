@@ -31,7 +31,7 @@ def to_json_response(data, status=200):
   Returns
   django.http.HttpResponse
   """
-  return http.HttpResponse(json.dumps(data, default=_to_json_default),
+  return http.HttpResponse(json.dumps(data, default=_to_json_default, indent=2),
                       status=status,
                       content_type="application/json")
 
