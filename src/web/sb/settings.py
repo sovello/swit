@@ -129,27 +129,33 @@ INSTALLED_APPS = (
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-      'verbose': {
-        'format': '%(asctime)s %(module)s %(levelname)s %(process)d %(thread)d %(message)s'
-        },
-      'simple': {
-        'format': '%(levelname)s %(message)s'
-        },
-      },
-    'handlers': {
-      'app': {
-        'level': os.environ.get('APP_LOG_LEVEL', 'ERROR'),
-        'class': 'logging.FileHandler',
-        'formatter': 'verbose',
-        'filename': os.environ.get('APP_LOG_PATH', 'app.log')}
-      },
-    'loggers': {
-      '': {
-        'handlers': ['app']
-        }
-      }
+  'version': 1,
+  'disable_existing_loggers': True,
+  'formatters': {
+    'verbose': {
+      'format': '%(asctime)s %(module)s %(levelname)s %(process)d %(thread)d %(message)s'
+    },
+    'simple': {
+      'format': '%(levelname)s %(message)s'
+    },
+  },
+  'handlers': {
+    'app': {
+      'level': os.environ.get('APP_LOG_LEVEL', 'ERROR'),
+      'class': 'logging.FileHandler',
+      'formatter': 'verbose',
+      'filename': os.environ.get('APP_LOG_PATH', 'app.log')}
+  },
+  'loggers': {
+    'sb': {
+      'handlers': ['app'],
+      'level': 'DEBUG',
+      'propagate': False
+    },
+    '': {
+      'handlers': ['app'],
+      'level': 'ERROR'
     }
+  }
+}
 

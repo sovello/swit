@@ -3,7 +3,9 @@
 
 import datetime
 import json
+import logging
 import re
+import sys
 import time
 import types
 
@@ -14,15 +16,25 @@ from django.db import transaction
 
 from sb import http
 from sb.healthworker import models
+from sb.healthworker import stopwords
 import sb.util
-import sys
 
+_log = logging.getLogger('sb.healthworker.views')
 
 OK = 0
 ERROR_INVALID_INPUT = -1
 ERROR_INVALID_PATTERN = -2
 
 MAX_EDIT_DISTANCE = 2
+
+def _log_request_json(function):
+  def new_function(request):
+    json = getattr(request, 'JSON', None)
+    uri = request.get_full_path()
+    _log.info(u'request: %r json: %r', uri, json)
+    response = function(request)
+    return response
+  return new_function
 
 def _specialty_to_dictionary(specialty):
   "Convert a Specialty to a dictionary suitable for JSON encoding"
@@ -172,6 +184,7 @@ def on_region_index(request):
       regions = regions.filter(**{key: val})
   title = request.GET.get("title")
   if title:
+    title = stopwords.fix_district_query(title)
     regions = edit_search(regions, "healthworker_region.title", title)
   regions = regions.prefetch_related("type").all()
 
@@ -216,6 +229,7 @@ def on_facility_index(request):
 
   title = request.GET.get("title")
   if title:
+    title = stopwords.fix_facility_query(title)
     facilities = edit_search(facilities, "title", title)
 
   facilities = facilities.prefetch_related("type")
@@ -332,6 +346,7 @@ def parse_healthworker_input(data):
     "other_phone": string_parser(required=False, max_length=255)})
   return parser(data)
 
+
 def on_health_workers_save(request):
   if not request.is_json:
     return http.to_json_response({
@@ -395,6 +410,7 @@ def on_health_workers_index(request):
         "facility": i.facility_id}
        for i in health_workers]})
 
+@_log_request_json
 def on_health_worker(request):
   if request.method == "POST":
     return on_health_workers_save(request)
