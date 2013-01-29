@@ -389,6 +389,7 @@ def on_health_workers_index(request):
   """Get an index of health care workers"""
   health_workers = models.HealthWorker.objects.all()
   health_workers = health_workers.prefetch_related("specialties", "facility").all()
+
   return http.to_json_response(
     {"status": OK,
      "health_workers": [
@@ -408,7 +409,7 @@ def on_health_workers_index(request):
         "other_phone": i.other_phone,
         "specialties": [s.id for s in i.specialties.all()],
         "facility": i.facility_id}
-       for i in health_workers]})
+       for i in health_workers if i.verification_state]})
 
 @_log_request_json
 def on_health_worker(request):
