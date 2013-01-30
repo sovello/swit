@@ -1,0 +1,17 @@
+Style Guidelines
+
+Python
+
+1. Use 2 spaces to indent blocks
+2. Follow PEP-8, Google Python style guidelines
+3. Keep layout simple, easy to read.  Prefer short lines.  Use parentheses to extend long lines instead of continuations (\)
+4. Naming: ClassNames, method_or_function_names, variable_names, CONSTANT_VARIABLES, _unexported_variables
+5. Use double quote docstrings
+6. Avoid indirection where possible.
+7. Add a line "# Copyright Switchboard YYYY" to the top of files
+
+Filesystem
+
+* docs: documentation
+* src/${project|platform}: source code for a project|platform
+
