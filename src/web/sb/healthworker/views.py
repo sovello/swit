@@ -346,7 +346,6 @@ def parse_healthworker_input(data):
     "other_phone": string_parser(required=False, max_length=255)})
   return parser(data)
 
-
 def on_health_workers_save(request):
   if not request.is_json:
     return http.to_json_response({
@@ -383,7 +382,6 @@ def on_health_workers_save(request):
     health_worker.auto_verify()
     health_worker.save()
     return http.to_json_response({"status": OK, "id": health_worker.id})
-
 
 def on_health_workers_index(request):
   """Get an index of health care workers"""

@@ -15,12 +15,22 @@ district_pattern = re.compile(ur"""
                               | uma
                               | city
                               | jiji la
+                              | district\s+council
                               | dc
-                              | Halmashauri ya Wilaya ya
-                              | MC
-                              | Halmashauri ya Manispaa ya
-                              | TC
-                              | Halmashauri ya Mji wa
+                              | Halmashauri\s+ya\s+Wilaya\s+ya
+                              | Municipal\s+Council
+                              | mc
+                              | Halmashauri\s+ya\s+Manispaa\s+ya
+                              | Town\s+Council
+                              | tc
+                              | Halmashauri\s+ya\s+Mji\s+wa
+                              | city
+                              | Jiji\s+la
+                              | municipal
+                              | Manispaa
+                              | town
+                              | Mji
+                              | district
                               )
                               \b
                               """, re.I | re.X | re.U)
@@ -28,25 +38,41 @@ district_pattern = re.compile(ur"""
 facility_pattern = re.compile(ur"""
                           \b
                           (?:
-                          dental clinic
-                          |kliniki ya meno
-                          |dispensary
-                          |zahanati
-                          |eye clinic
-                          |kliniki ya macho
-                          |health center
-                          |health centre
-                          |kituo cha afya
-                          |hospital
-                          |hospitali
-                          |maternity home
-                          |kituo cha uzazi
-                          |surgical clinic
-                          |klinini ya upasuaj
-                          |clinic
-                          |kliniki
-                          |vct
-                          |kituo cha kutoa ushauri nasaha
+                          dental\s+clinic
+                          | kliniki\s+ya\s+meno
+                          | dispensary
+                          | zahanati
+                          | eye\s+clinic
+                          | kliniki\s+ya\s+macho
+                          | health\s+center
+                          | health\s+centre
+                          | kituo\s+cha\s+afya
+                          | hospital
+                          | hospitali
+                          | maternity\s+home
+                          | kituo\scha\s+uzazi
+                          | surgical\s+clinic
+                          | klinini\s+ya\s+upasuaj
+                          | clinic
+                          | kliniki
+                          | vct
+                          | kituo\s+cha\s+kutoa\s+ushauri\s+nasaha
+                          | district\s+council
+                          | dc
+                          | Halmashauri\s+ya\s+Wilaya\s+ya
+                          | Municipal\s+Council
+                          | mc
+                          | Halmashauri\s+ya\s+Manispaa\s+ya
+                          | Town\s+Council
+                          | tc
+                          | Halmashauri\s+ya\s+Mji\s+wa
+                          | city
+                          | Jiji\s+la
+                          | municipal
+                          | Manispaa
+                          | town
+                          | Mji
+                          | district
                           )
                           \b
                           """, re.X | re.I | re.UNICODE)
