@@ -1,6 +1,17 @@
 # Copyright 2012 Switchboard, Inc
 
 from django.db import models
+import sb.util
+
+ACTIVATION_SMSES = {
+  "en":
+    ("Congratulations, you are added to the Health Network Programme!"
+     " You can now make free calls and SMSs to other practitioners in"
+     " the programme."),
+  "sw":
+    ("HONGERA! umefanikiwa kujiunga na Mtandao wa watumishi wa Afya"
+     " nchini.Sasa unaweza kuongea na kutuma SMS BURE."),
+}
 
 class HealthWorker(models.Model):
   address = models.TextField(null=True, blank=True)
@@ -60,6 +71,13 @@ class HealthWorker(models.Model):
           r.save()
           self.verification_state = self.MCT_REGISTRATION_VERIFIED
           self.save()
+
+  def send_activation_sms(self):
+    content = ACTIVATION_SMSES.get(self.language)
+    if content is None:
+        raise ValueError("Activation SMS not available in language %r" %
+                         self.language)
+    sb.util.send_vumigo_sms(self.vodacom_phone, content)
 
   # This improves the Django admin view:
   def __unicode__(self):
