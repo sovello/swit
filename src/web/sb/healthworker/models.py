@@ -3,7 +3,7 @@
 from django.db import models
 import sb.util
 
-ACTIVATION_SMSES = {
+CUG_ACTIVATION_SMSES = {
   "en":
     ("Congratulations, you are added to the Health Network Programme!"
      " You can now make free calls and SMSs to other practitioners in"
@@ -11,6 +11,17 @@ ACTIVATION_SMSES = {
   "sw":
     ("HONGERA! umefanikiwa kujiunga na Mtandao wa watumishi wa Afya"
      " nchini.Sasa unaweza kuongea na kutuma SMS BURE."),
+}
+
+CUG_DEACTIVATION_SMSES = {
+  "en":
+    ("You have been removed from the Health Network Programme and"
+     " may no longer make free calls and SMSs to practitioners in"
+     " the programme."),
+  "sw":
+    ("You have been removed from the Health Network Programme and"
+     " may no longer make free calls and SMSs to practitioners in"
+     " the programme."),  # TODO: translate
 }
 
 class HealthWorker(models.Model):
@@ -44,6 +55,8 @@ class HealthWorker(models.Model):
                                                     (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
                                                     (MANUALLY_VERIFIED, u"Manually Verified")])
 
+  in_closed_user_group = models.BooleanField(default=False)
+
   def auto_verify(self):
     if self.verification_state != self.UNVERIFIED:
       return
@@ -72,10 +85,27 @@ class HealthWorker(models.Model):
           self.verification_state = self.MCT_REGISTRATION_VERIFIED
           self.save()
 
+  def set_closed_user_group(self, in_group):
+    if in_group == self.in_closed_user_group:
+      return
+    if in_group:
+      self.send_activation_sms()
+    else:
+      self.send_deactivation_sms()
+    self.in_closed_user_group = in_group
+    self.save()
+
   def send_activation_sms(self):
-    content = ACTIVATION_SMSES.get(self.language)
+    content = CUG_ACTIVATION_SMSES.get(self.language)
     if content is None:
         raise ValueError("Activation SMS not available in language %r" %
+                         self.language)
+    sb.util.send_vumigo_sms(self.vodacom_phone, content)
+
+  def send_deactivation_sms(self):
+    content = CUG_DEACTIVATION_SMSES.get(self.language)
+    if content is None:
+        raise ValueError("Deactivation SMS not available in language %r" %
                          self.language)
     sb.util.send_vumigo_sms(self.vodacom_phone, content)
 

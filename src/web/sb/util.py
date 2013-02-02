@@ -24,6 +24,8 @@ def read_tsv(path):
       yield item
 
 def send_vumigo_sms(to_addr, content):
+  if not settings.VUMIGO_SEND_SMSES:
+    return
   if settings.VUMIGO_API_URL is None:
     raise ValueError("Can't send SMS, VUMIGO_API_URL not configured")
   username = settings.VUMIGO_CONVERSATION_ID
