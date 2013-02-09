@@ -41,6 +41,7 @@ class HealthWorker(models.Model):
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
+  is_closed_user_group = models.BooleanField(default=False)
 
   UNVERIFIED = 0
   MCT_PAYROLL_VERIFIED = 1
@@ -55,7 +56,6 @@ class HealthWorker(models.Model):
                                                     (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
                                                     (MANUALLY_VERIFIED, u"Manually Verified")])
 
-  in_closed_user_group = models.BooleanField(default=False)
 
   def auto_verify(self):
     if self.verification_state != self.UNVERIFIED:
@@ -86,13 +86,14 @@ class HealthWorker(models.Model):
           self.save()
 
   def set_closed_user_group(self, in_group):
-    if in_group == self.in_closed_user_group:
+    in_group = bool(in_group)
+    if in_group == self.is_closed_user_group:
       return
     if in_group:
       self.send_activation_sms()
     else:
       self.send_deactivation_sms()
-    self.in_closed_user_group = in_group
+    self.is_closed_user_group = in_group
     self.save()
 
   def send_activation_sms(self):
