@@ -36,12 +36,13 @@ class HealthWorker(models.Model):
   name = models.CharField(max_length=255, null=False, blank=False)
   surname = models.CharField(null=True, max_length=128, blank=True)
   other_phone = models.CharField(max_length=255, null=True, blank=True)
-  specialties = models.ManyToManyField("Specialty")
+  specialties = models.ManyToManyField("Specialty", blank=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
-  is_closed_user_group = models.BooleanField(default=False)
+  is_closed_user_group = models.BooleanField(default=False, blank=True)
+  request_closed_user_group_at = models.DateTimeField(null=True, default=None, blank=True)
 
   UNVERIFIED = 0
   MCT_PAYROLL_VERIFIED = 1
