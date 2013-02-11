@@ -3,33 +3,24 @@ import datetime
 import optparse
 import re
 
+import tablib
+
 from sb.healthworker import models
 from django.db import transaction
 from django.core.mail import EmailMessage
 
-
-def csv_escape(s):
-  if not s:
-    s = u''
-  s = u'"%s"' % (s, )
-  return s
-
-def to_csv(vals):
-  return u','.join(map(csv_escape, vals))
-
-def healthworkers_to_csv(health_workers):
-  buf = []
-  buf.append(to_csv(['name', 'phone']))
-  for h in health_workers:
-    buf.append(to_csv([h.name, h.vodacom_phone]))
-  return u'\n'.join(buf).encode('utf-8')
+def fix_phone(phone):
+  if phone.startswith('+2557'):
+    phone = '07' + phone[5:]
+  elif phone.startswith('7'):
+    phone = '0' + phone
+  return phone
 
 def main():
   parser = optparse.OptionParser()
   parser.add_option('--save', action='store_true', help=u'save changes')
   parser.add_option('--src-email', default="hostmaster@switchboard.org")
-  parser.add_option('--dst-email', default="bickfordb@gmail.com")
-
+  parser.add_option('--dst-email', default="brandon@switchboard.org")
   opts, args = parser.parse_args()
 
   cols = ['name', 'phone']
@@ -53,7 +44,6 @@ def main():
           transaction.rollback()
           raise
 
-
   with commit_block():
     health_workers = models.HealthWorker.objects
     health_workers = health_workers.filter(request_closed_user_group_at=None)
@@ -69,13 +59,15 @@ def main():
           h.request_closed_user_group_at = datetime.datetime.now()
           h.save()
     if health_workers:
-      csv = healthworkers_to_csv(health_workers)
+      dataset = tablib.Dataset(
+        *[(fix_phone(i.vodacom_phone), i.name or u"") for i in health_workers],
+        headers=["phone_number", "name"])
       email = EmailMessage(u"Closed User Group Request %s" % (datetime.datetime.now(), ),
                            u"Please add the attached users to the closed user group.  Thanks!",
                            opts.src_email,
                            [opts.dst_email])
-      filename = datetime.datetime.now().strftime("cug-request-%Y%m%d-%H%M%S.csv")
-      email.attach(filename, csv, "text/csv")
+      filename = datetime.datetime.now().strftime("cug-request-%Y%m%d-%H%M%S.xls")
+      email.attach(filename, dataset.xls, "application/vnd.ms-excel")
       email.send()
 
 if __name__ == "__main__":
