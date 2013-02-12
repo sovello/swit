@@ -4,11 +4,14 @@ afya post na
 afya post wa
 afya post ya
 afya post za
+AICT
 AICT la
 AICT na
 AICT wa
 AICT ya
 AICT za
+and
+Anglican
 Anglikani
 Anglikani la
 Anglikani na
@@ -28,7 +31,7 @@ Askofu wa
 Askofu ya
 Askofu za
 Assemblies of God
-Binafsi
+Babtist
 Binafsi
 binafsi KIA
 binafsi KIA la
@@ -37,19 +40,26 @@ binafsi KIA wa
 binafsi KIA ya
 binafsi KIA za
 binafsi la
-Binafsi la
 binafsi na
-Binafsi na
 binafsi wa
-Binafsi wa
 binafsi ya
-Binafsi ya
 binafsi za
-Binafsi za
 Bishop
 Bishop CRCT
+Bukwata
+Church of God
+City
+Clinic
 Council
+DC
+DDH
+Dental Clinic
+Disp
+Dispensary
+District 
+Eye Clinic
 Fbo
+FPCT
 FPCT la
 FPCT na
 FPCT wa
@@ -68,7 +78,6 @@ Halmashauri ya Manispaa za
 Halmashauri ya Mji la
 Halmashauri ya Mji na
 Halmashauri ya Mji wa
-Halmashauri ya Mji wa
 Halmashauri ya Mji za
 Halmashauri ya Wilaya la
 Halmashauri ya Wilaya na
@@ -76,13 +85,18 @@ Halmashauri ya Wilaya wa
 Halmashauri ya Wilaya ya
 Halmashauri ya Wilaya za
 Halmashauri za
+HC
 Health Center
+HP
 Health Post
+Hindu
 Hindu la
 Hindu na
 Hindu wa
 Hindu ya
 Hindu za
+Hosp
+Hospital
 Hospitali
 Hospitali la
 Hospitali na
@@ -103,10 +117,7 @@ Jeshi la Wananji Tanzania wa
 Jeshi la Wananji Tanzania ya
 Jeshi la Wananji Tanzania za
 Jiji la
-Jiji la
-Jiji la
-Jiji la
-Jiji la
+Kanisa la Mungu
 Kanisa la Mungu la
 Kanisa la Mungu na
 Kanisa la Mungu wa
@@ -172,7 +183,11 @@ Klinini ya Upasuaji na
 Klinini ya Upasuaji wa
 Klinini ya Upasuaji ya
 Klinini ya Upasuaji za
+la
+lab
+Laboratory
 LGA
+Lutheran
 maabara
 maabara la
 maabara na
@@ -185,6 +200,7 @@ maalum kliniki na
 maalum kliniki wa
 maalum kliniki ya
 maalum kliniki za
+Magereza
 makanisa ya mungu
 makanisa ya mungu la
 makanisa ya mungu na
@@ -197,12 +213,18 @@ Manispaa na
 Manispaa wa
 Manispaa ya
 Manispaa za
+Maternity
+Maternity Home
+MC
 MDA
+Menonite
+Mji
 Mji la
 Mji na
 Mji wa
 Mji ya
 Mji za
+Mjini
 Mjini la
 Mjini na
 Mjini wa
@@ -220,7 +242,8 @@ msingi ya huduma za nyumbani na
 msingi ya huduma za nyumbani wa
 msingi ya huduma za nyumbani ya
 msingi ya huduma za nyumbani za
-NAFCO
+Municipal
+na
 NAFCO
 NAFCO la
 NAFCO na
@@ -228,14 +251,26 @@ NAFCO wa
 NAFCO ya
 NAFCO za
 Parastatal
+Parastatal TAZARA
+Parastatal TRC
+Pentecoste
 Pentecoste la
 Pentecoste na
 Pentecoste wa
 Pentecoste ya
 Pentecoste za
+Police
+Polisi
 Primary Home Care
+Prisons
+Private
+Private KIA
 Public
+RC
 Religious
+Roman Catholic
+Rural
+SDA
 Serikali za Mitaa
 Serikali za Mitaa la
 Serikali za Mitaa na
@@ -270,38 +305,44 @@ Taasi ya Serikali na
 Taasi ya Serikali wa
 Taasi ya Serikali ya
 Taasi ya Serikali za
+TAG
 TAG la
 TAG na
 TAG wa
 TAG ya
 TAG za
 TANAPA
-TANAPA
 TANAPA la
 TANAPA na
 TANAPA wa
 TANAPA ya
 TANAPA za
-TASAF
+TANESCO
 TASAF
 TASAF la
 TASAF na
 TASAF wa
 TASAF ya
 TASAF za
+TAZARA
 TC
+the
 tovuti huduma
 tovuti huduma la
 tovuti huduma na
 tovuti huduma wa
 tovuti huduma ya
 tovuti huduma za
+Town
+TPDF
 Uma
 Uma la
 Uma na
 Uma wa
 Uma ya
 Uma za
+Urban
+VCT
 Vijijini
 Vijijini la
 Vijijini na
@@ -309,12 +350,14 @@ Vijijini wa
 Vijijini ya
 Vijijini za
 voluntary counseling and testing
+wa
 Wilala la
 Wilana na
 Wilawa wa
 Wilaya
 Wilaya ya
 Wilaza za
+ya
 Ya Kidini
 Ya Kidini la
 Ya Kidini na
@@ -327,3 +370,4 @@ Zahanati na
 Zahanati wa
 Zahanati ya
 Zahanati za
+
