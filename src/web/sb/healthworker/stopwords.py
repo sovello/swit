@@ -1,81 +1,45 @@
 import re
 
-district_pattern = re.compile(ur"""
-                              \b
-                              (?:
-                              rural
-                              | vijijini
-                              | urban
-                              | mjini
-                              | fbo
-                              | kidini
-                              | private
-                              | binafsi
-                              | public
-                              | uma
-                              | city
-                              | jiji la
-                              | district\s+council
-                              | dc
-                              | Halmashauri\s+ya\s+Wilaya\s+ya
-                              | Municipal\s+Council
-                              | mc
-                              | Halmashauri\s+ya\s+Manispaa\s+ya
-                              | Town\s+Council
-                              | tc
-                              | Halmashauri\s+ya\s+Mji\s+wa
-                              | city
-                              | Jiji\s+la
-                              | municipal
-                              | Manispaa
-                              | town
-                              | Mji
-                              | district
-                              )
-                              \b
-                              """, re.I | re.X | re.U)
+import os
+import os.path
 
-facility_pattern = re.compile(ur"""
-                          \b
-                          (?:
-                          dental\s+clinic
-                          | kliniki\s+ya\s+meno
-                          | dispensary
-                          | zahanati
-                          | eye\s+clinic
-                          | kliniki\s+ya\s+macho
-                          | health\s+center
-                          | health\s+centre
-                          | kituo\s+cha\s+afya
-                          | hospital
-                          | hospitali
-                          | maternity\s+home
-                          | kituo\scha\s+uzazi
-                          | surgical\s+clinic
-                          | klinini\s+ya\s+upasuaj
-                          | clinic
-                          | kliniki
-                          | vct
-                          | kituo\s+cha\s+kutoa\s+ushauri\s+nasaha
-                          | district\s+council
-                          | dc
-                          | Halmashauri\s+ya\s+Wilaya\s+ya
-                          | Municipal\s+Council
-                          | mc
-                          | Halmashauri\s+ya\s+Manispaa\s+ya
-                          | Town\s+Council
-                          | tc
-                          | Halmashauri\s+ya\s+Mji\s+wa
-                          | city
-                          | Jiji\s+la
-                          | municipal
-                          | Manispaa
-                          | town
-                          | Mji
-                          | district
-                          )
-                          \b
-                          """, re.X | re.I | re.UNICODE)
+_root = os.path.split(__file__)[0]
+common_phrases_txt = os.path.join(_root, 'common-phrases.txt')
+facility_common_phrases_txt = os.path.join(_root, 'facility-common-phrases.txt')
+district_common_phrases_txt = os.path.join(_root, 'district-common-phrases.txt')
+
+def get_pattern(files):
+  phrase_terms = []
+  for f in files:
+    with open(f, "r") as a_file:
+      for line in a_file:
+        terms = line.decode('utf-8').strip().lower().split()
+        if not terms:
+          continue
+        phrase_terms.append(terms)
+  phrase_terms.sort(key=len)
+  phrase_terms.reverse()
+  pattern = (ur"\b(?:"
+             + ur"|".join(ur"\s+".join(terms) for terms in phrase_terms)
+             + ur")\b")
+  pattern = re.compile(pattern, re.I | re.X | re.U)
+  return pattern
+
+_facility_pat = None
+
+def get_facility_pattern():
+  global _facility_pat
+  if _facility_pat is None:
+    _facility_pat = get_pattern([common_phrases_txt, facility_common_phrases_txt])
+  return _facility_pat
+
+_district_pat = None
+
+def get_district_pattern():
+  global _district_pat
+  if _district_pat is None:
+    _district_pat = get_pattern([common_phrases_txt, district_common_phrases_txt])
+  return _district_pat
 
 def fix_query(q, patterns):
   if q:
@@ -93,8 +57,8 @@ def fix_query(q, patterns):
     return u''
 
 def fix_facility_query(query):
-  return fix_query(query, [facility_pattern])
+  return fix_query(query, [get_facility_pattern()])
 
 def fix_district_query(query):
-  return fix_query(query, [district_pattern])
+  return fix_query(query, [get_district_pattern()])
 
