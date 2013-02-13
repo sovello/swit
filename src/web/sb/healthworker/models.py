@@ -87,6 +87,7 @@ class HealthWorker(models.Model):
           self.save()
 
   def set_closed_user_group(self, in_group):
+    "Set the closed user group status of a user"
     in_group = bool(in_group)
     if in_group == self.is_closed_user_group:
       return
@@ -99,16 +100,14 @@ class HealthWorker(models.Model):
 
   def send_activation_sms(self):
     content = CUG_ACTIVATION_SMSES.get(self.language)
-    if content is None:
-        raise ValueError("Activation SMS not available in language %r" %
-                         self.language)
+    if not content:
+      content = CUG_ACTIVATION_SMSES["en"]
     sb.util.send_vumigo_sms(self.vodacom_phone, content)
 
   def send_deactivation_sms(self):
     content = CUG_DEACTIVATION_SMSES.get(self.language)
     if content is None:
-        raise ValueError("Deactivation SMS not available in language %r" %
-                         self.language)
+      content = CUG_DEACTIVATION_SMSES["en"]
     sb.util.send_vumigo_sms(self.vodacom_phone, content)
 
   # This improves the Django admin view:

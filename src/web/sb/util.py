@@ -38,4 +38,7 @@ def send_vumigo_sms(to_addr, content):
     "content": content,
     "to_addr": to_addr
   }))
-  urllib2.urlopen(request)
+  client = urllib2.urlopen(request)
+  # ... do something?
+
+

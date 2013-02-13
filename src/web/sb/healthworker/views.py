@@ -1,6 +1,7 @@
 # Copyright 2012 Switchboard, Inc
 
 
+import csv
 import datetime
 import json
 import logging
@@ -8,6 +9,7 @@ import re
 import sys
 import time
 import types
+import StringIO
 
 from django.core import serializers
 from django.http import HttpResponse
@@ -18,6 +20,7 @@ from sb import http
 from sb.healthworker import models
 from sb.healthworker import stopwords
 import sb.util
+import sb.html
 
 _log = logging.getLogger('sb.healthworker.views')
 
@@ -494,3 +497,42 @@ def on_facility_create(request):
     facility.save()
     return http.to_json_response({"status": OK, "id": facility.id})
 
+class UploadForm(forms.Form):
+  members = forms.FileField()
+
+def normalize_tz_phone(phone_number):
+  if phone_number.startswith('255'):
+    return '+' + phone_number
+  elif phone_number.startswith('07'):
+    return '+255' + phone_number[1:]
+  elif phone_number.startswith('7'):
+    return '+255' + phone_number
+  else:
+    return phone_number
+
+def cug(request):
+  if request.method == "POST":
+    form = UploadForm(request.POST, request.FILES)
+    if form.is_valid():
+      members_file = request.FILES["members"]
+      members_file_bytes = members_file.read()
+      member_buf = StringIO.StringIO(members_file_bytes)
+      entries = csv.DictReader(member_buf)
+      phone_numbers = []
+      for entry in entries:
+        if "phone" in entry:
+          phone = entry["phone"]
+          phone = normalize_tz_phone(phone)
+          if phone:
+            phone_numbers.append(phone)
+      with transaction.commit_on_success():
+        hws = models.HealthWorker.objects.filter(vodacom_phone__in=phone_numbers)
+        for hw in hws:
+          hw.set_closed_user_group(True)
+      members_file_name = members_file.name
+  else:
+    form = UploadForm()
+  return sb.html.render_response(request,
+                                 "sb.healthworker",
+                                 "cug.html",
+                                 form=form)
