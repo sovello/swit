@@ -23,9 +23,6 @@ def main():
   parser.add_option('--dst-email', default="brandon@switchboard.org")
   opts, args = parser.parse_args()
 
-  cols = ['name', 'phone']
-  model_cols = ['name', 'vodacom_phone']
-
   @contextlib.contextmanager
   def commit_block():
     with transaction.commit_manually():
@@ -60,7 +57,7 @@ def main():
           h.save()
     if health_workers:
       dataset = tablib.Dataset(
-        *[(fix_phone(i.vodacom_phone), i.name or u"") for i in health_workers],
+        *[(fix_phone(i.vodacom_phone), i.surname or u"") for i in health_workers],
         headers=["phone_number", "name"])
       email = EmailMessage(u"Closed User Group Request %s" % (datetime.datetime.now(), ),
                            u"Please add the attached users to the closed user group.  Thanks!",
