@@ -42,6 +42,7 @@ class HealthWorker(models.Model):
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
   is_closed_user_group = models.BooleanField(default=False, blank=True)
+  added_to_closed_user_group_at = models.DateTimeField(null=True, default=None, blank=True)
   request_closed_user_group_at = models.DateTimeField(null=True, default=None, blank=True)
 
   UNVERIFIED = 0
@@ -96,6 +97,10 @@ class HealthWorker(models.Model):
     else:
       self.send_deactivation_sms()
     self.is_closed_user_group = in_group
+    if in_group:
+      self.added_to_closed_user_group_at = datetime.datetime.now()
+    else:
+      self.added_to_closed_user_group_at = None
     self.save()
 
   def send_activation_sms(self):
