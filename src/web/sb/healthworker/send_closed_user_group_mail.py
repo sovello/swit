@@ -43,7 +43,6 @@ def main():
 
   with commit_block():
     health_workers = models.HealthWorker.objects
-    health_workers = health_workers.filter(request_closed_user_group_at=None)
     health_workers = health_workers.filter(is_closed_user_group=False)
     health_workers = health_workers.exclude(verification_state=None)
     health_workers = health_workers.exclude(verification_state=models.HealthWorker.UNVERIFIED)
