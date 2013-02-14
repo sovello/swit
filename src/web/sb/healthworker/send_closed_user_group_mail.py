@@ -21,6 +21,7 @@ def main():
   parser.add_option('--save', action='store_true', help=u'save changes')
   parser.add_option('--src-email', default="hostmaster@switchboard.org")
   parser.add_option('--dst-email', default="brandon@switchboard.org")
+  parser.add_option('--cc-email', default=[], action='append')
   opts, args = parser.parse_args()
 
   @contextlib.contextmanager
@@ -46,6 +47,7 @@ def main():
     health_workers = health_workers.filter(is_closed_user_group=False)
     health_workers = health_workers.exclude(verification_state=None)
     health_workers = health_workers.exclude(verification_state=models.HealthWorker.UNVERIFIED)
+    health_workers = health_workers.exclude(verification_state=models.HealthWorker.MANUALLY_VERIFIED)
     health_workers = health_workers.exclude(vodacom_phone=None)
     health_workers = health_workers.exclude(vodacom_phone=u'')
     health_workers = health_workers.all()
@@ -61,7 +63,8 @@ def main():
       email = EmailMessage(u"Closed User Group Request %s" % (datetime.datetime.now(), ),
                            u"Please add the attached users to the closed user group.  Thanks!",
                            opts.src_email,
-                           [opts.dst_email])
+                           [opts.dst_email],
+                           cc=opts.cc_email if opts.cc_email else None)
       filename = datetime.datetime.now().strftime("cug-request-%Y%m%d-%H%M%S.xls")
       email.attach(filename, dataset.xls, "application/vnd.ms-excel")
       email.send()
