@@ -47,7 +47,6 @@ def main():
     health_workers = health_workers.filter(is_closed_user_group=False)
     health_workers = health_workers.exclude(verification_state=None)
     health_workers = health_workers.exclude(verification_state=models.HealthWorker.UNVERIFIED)
-    health_workers = health_workers.exclude(verification_state=models.HealthWorker.MANUALLY_VERIFIED)
     health_workers = health_workers.exclude(vodacom_phone=None)
     health_workers = health_workers.exclude(vodacom_phone=u'')
     health_workers = health_workers.all()
