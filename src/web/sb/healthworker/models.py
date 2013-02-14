@@ -1,6 +1,10 @@
 # Copyright 2012 Switchboard, Inc
 
+import datetime
+
 from django.db import models
+
+import sb.logchan
 import sb.util
 
 CUG_ACTIVATION_SMSES = {
@@ -102,6 +106,11 @@ class HealthWorker(models.Model):
     else:
       self.added_to_closed_user_group_at = None
     self.save()
+    sb.logchan.write("closed-user-group-change",
+                     phone=self.vodacom_phone,
+                     change=in_group,
+                     id=self.id)
+
 
   def send_activation_sms(self):
     content = CUG_ACTIVATION_SMSES.get(self.language)
