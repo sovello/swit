@@ -3,11 +3,12 @@ import datetime
 import optparse
 import re
 
+from django.core.mail import EmailMessage
+from django.db import transaction
+from django.utils.timezone import utc
 import tablib
 
 from sb.healthworker import models
-from django.db import transaction
-from django.core.mail import EmailMessage
 
 def fix_phone(phone):
   if phone.startswith('+2557'):
@@ -42,6 +43,7 @@ def main():
           transaction.rollback()
           raise
 
+  now = datetime.datetime.utcnow().replace(tzinfo=utc)
   with commit_block():
     health_workers = models.HealthWorker.objects
     health_workers = health_workers.filter(is_closed_user_group=False)
@@ -53,18 +55,18 @@ def main():
     health_workers = list(health_workers)
     for h in health_workers:
       if not h.request_closed_user_group_at:
-          h.request_closed_user_group_at = datetime.datetime.now()
+          h.request_closed_user_group_at = now
           h.save()
-    if health_workers:
+    if True or health_workers:
       dataset = tablib.Dataset(
         *[(fix_phone(i.vodacom_phone), i.surname or u"") for i in health_workers],
         headers=["phone_number", "name"])
-      email = EmailMessage(u"Closed User Group Request %s" % (datetime.datetime.now(), ),
+      email = EmailMessage(u"Closed User Group Request %s" % (now, ),
                            u"Please add the attached users to the closed user group.  Thanks!",
                            opts.src_email,
                            [opts.dst_email],
                            cc=opts.cc_email if opts.cc_email else None)
-      filename = datetime.datetime.now().strftime("cug-request-%Y%m%d-%H%M%S.xls")
+      filename = now.strftime("cug-request-%Y%m%d-%H%M%S.xls")
       email.attach(filename, dataset.xls, "application/vnd.ms-excel")
       email.send()
 
