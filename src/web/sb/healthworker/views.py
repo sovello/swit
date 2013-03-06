@@ -516,6 +516,10 @@ def cug(request):
     if form.is_valid():
       members_file = request.FILES["members"]
       members_file_bytes = members_file.read()
+      if '\n' not in members_file_bytes:
+        members_file_bytes = members_file_bytes.replace('\r', '\r\n')
+      if '\r' not in members_file_bytes:
+        members_file_bytes = members_file_bytes.replace('\n', '\r\n')
       member_buf = StringIO.StringIO(members_file_bytes)
       entries = csv.DictReader(member_buf)
       phone_numbers = []
