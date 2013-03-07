@@ -533,7 +533,6 @@ def cug(request):
         hws = models.HealthWorker.objects.filter(vodacom_phone__in=phone_numbers)
         for hw in hws:
           hw.set_closed_user_group(True)
-      members_file_name = members_file.name
   else:
     form = UploadForm()
   return sb.html.render_response(request,

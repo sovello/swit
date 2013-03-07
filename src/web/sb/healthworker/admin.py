@@ -33,7 +33,8 @@ class MCTRegistrationAdmin(admin.ModelAdmin):
   search_fields = ["name"]
 
 class HealthWorkerAdmin(admin.ModelAdmin):
-  list_display = ["name", "created_at", "updated_at", "mct_registration_num", "mct_payroll_num", "email", "verification_state", "vodacom_phone", "is_closed_user_group"]
+  list_display = ["name", "created_at", "updated_at", "mct_registration_num", "mct_payroll_num", "email", "verification_state", "vodacom_phone", "is_closed_user_group", "request_closed_user_group_at", "added_to_closed_user_group_at"]
+  search_fields = ["name", "vodacom_phone", "email", "mct_registration_num", "mct_payroll_num"]
 
 admin.site.register(models.Facility, FacilityAdmin)
 admin.site.register(models.FacilityType)
