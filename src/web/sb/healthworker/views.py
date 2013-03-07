@@ -189,7 +189,7 @@ def on_region_index(request):
   if title:
     title = stopwords.fix_district_query(title)
     regions = edit_search(regions, "healthworker_region.title", title)
-  regions = regions.prefetch_related("type").all()
+  regions = regions.prefetch_related("type", "region").all()
 
   response = {
       "status": OK,
@@ -197,6 +197,14 @@ def on_region_index(request):
   return http.to_json_response(response)
 
 def _facility_to_dictionary(facility):
+  region = None
+  r = facility.region
+  if r is not None:
+    region = {
+      "title": r.title,
+      "id": r.id,
+      "parent_region_id": r.parent_region_id,
+      "type_id": r.type_id}
   return {
       "id": facility.id,
       "title": facility.title,
@@ -207,8 +215,8 @@ def _facility_to_dictionary(facility):
       "owner": facility.owner,
       "ownership_type": facility.ownership_type,
       "phone": facility.phone,
-      "place_type": facility.place_type,
       "region_id": facility.region_id,
+      "region": region,
       "created_at": facility.created_at,
       "updated_at": facility.updated_at}
 
