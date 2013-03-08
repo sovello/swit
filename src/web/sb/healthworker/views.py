@@ -189,7 +189,7 @@ def on_region_index(request):
   if title:
     title = stopwords.fix_district_query(title)
     regions = edit_search(regions, "healthworker_region.title", title)
-  regions = regions.prefetch_related("type", "region").all()
+  regions = regions.prefetch_related("type").all()
 
   response = {
       "status": OK,
