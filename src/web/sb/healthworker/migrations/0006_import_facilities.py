@@ -4,6 +4,7 @@ from django.db import transaction
 from south.v2 import SchemaMigration
 
 from sb.healthworker import models
+from sb.testing import is_testing
 
 def import_facility(f):
   tz = models.Region.get_or_create_region_by_title_type("TZ", "Country")
@@ -40,6 +41,8 @@ def import_facilities():
 
 class Migration(SchemaMigration):
     def forwards(self, orm):
+      if is_testing():
+        return
       with transaction.commit_on_success():
         import_facilities()
 

@@ -7,6 +7,7 @@ from south.db import db
 from south.v2 import SchemaMigration
 
 from sb.healthworker import models
+from sb.testing import is_testing
 import sb.healthworker
 
 def import_specialties():
@@ -48,5 +49,7 @@ def import_specialties():
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+      if is_testing():
+        return
       import_specialties()
 

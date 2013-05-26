@@ -6,6 +6,7 @@ from south.v2 import SchemaMigration
 
 from sb.healthworker import models
 from sb.util import safe, read_tsv
+from sb.testing import is_testing
 
 district_stem_pat = re.compile(r'\s+(?:disrict|district|mc|dc|cc)$', re.I)
 
@@ -62,6 +63,8 @@ def delete_facilities():
 
 class Migration(SchemaMigration):
     def forwards(self, orm):
+      if is_testing():
+        return
       with transaction.commit_on_success():
         delete_regions()
         delete_facilities()
