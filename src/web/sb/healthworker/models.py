@@ -77,12 +77,9 @@ class HealthWorker(models.Model):
           p.save()
         self.verification_state = self.MCT_PAYROLL_VERIFIED
         self.save()
-    if self.surname and self.mct_registration_num:
+    if self.mct_registration_num:
       regs = MCTRegistration.objects
       regs = regs.filter(registration_number=self.mct_registration_num)
-      where = ["edit_search(%s, name, 1)"]
-      where_params = [self.surname]
-      regs = regs.extra(where=where, params=where_params)
       regs = list(regs.all())
       if (regs and not any((r.health_worker_id is not None and r.health_worker_id != self.id) for r in regs)):
         for r in regs:
