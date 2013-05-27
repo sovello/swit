@@ -26,11 +26,11 @@ class FacilityAdmin(admin.ModelAdmin):
 
 class MCTPayrollAdmin(admin.ModelAdmin):
   list_display = ["name", "last_name", "designation", "birthdate", "check_number", "district", "health_worker", "specialty", "facility",  "region"]
-  search_fields = ["name"]
+  search_fields = ["name", "last_name", "designation", "birthdate", "check_number", "district", "health_worker", "specialty", "facility",  "region"]
 
 class MCTRegistrationAdmin(admin.ModelAdmin):
   list_display = ["name", "address", "birthdate", "cadre", "category", "country", "current_employer", "dates_of_registration_full", "dates_of_registration_temporary", "dates_of_registration_provisional", "email", "employer_during_internship", "facility", "file_number", "health_worker", "qualification_final", "qualification_provisional", "qualification_specialization_1", "qualification_specialization_2", "registration_number", "registration_type", "specialty", "specialty_duration", "created_at", "updated_at"]
-  search_fields = ["name"]
+  search_fields = ["name", "address", "birthdate", "cadre", "category", "country", "current_employer", "dates_of_registration_full", "dates_of_registration_temporary", "dates_of_registration_provisional", "email", "employer_during_internship", "facility", "file_number", "health_worker", "qualification_final", "qualification_provisional", "qualification_specialization_1", "qualification_specialization_2", "registration_number", "registration_type", "specialty", "specialty_duration"]
 
 class HealthWorkerAdmin(admin.ModelAdmin):
   list_display = ["name", "created_at", "updated_at", "mct_registration_num", "mct_payroll_num", "email", "verification_state", "vodacom_phone", "is_closed_user_group", "request_closed_user_group_at", "added_to_closed_user_group_at"]
