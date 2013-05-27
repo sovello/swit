@@ -14,7 +14,7 @@ from sb.healthworker.models import MCTPayroll
 
 class AutoVerifyTest(TestCase):
   def test_auto_verify(self):
-    with temp_health_worker(email='bickfordb@gmail.com') as hw:
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com') as hw:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
@@ -56,7 +56,4 @@ def temp_obj(django_type, **attrs):
     raise e0
   else:
     o.delete()
-
-def temp_health_worker(**k):
-  return temp_obj(HealthWorker, **k)
 
