@@ -68,10 +68,8 @@ class HealthWorker(models.Model):
       return
     if self.mct_payroll_num:
       payrolls = list(MCTPayroll.objects.filter(check_number=self.mct_payroll_num).all())
-      if (payrolls
-          and (not any(((p.health_worker_id != None)
-                         and (p.healthworker_id != self.id))
-                       for p in payrolls))):
+      payrolls = [p for p in payrolls if p.health_worker_id is None]
+      if payrolls:
         for p in payrolls:
           p.health_worker = self
           p.save()
@@ -81,12 +79,15 @@ class HealthWorker(models.Model):
       regs = MCTRegistration.objects
       regs = regs.filter(registration_number=self.mct_registration_num)
       regs = list(regs.all())
-      if (regs and not any((r.health_worker_id is not None and r.health_worker_id != self.id) for r in regs)):
+      regs = [r for r in regs if r.health_worker_id is None]
+      if regs:
         for r in regs:
           r.health_worker = self
           r.save()
           self.verification_state = self.MCT_REGISTRATION_VERIFIED
           self.save()
+          # Only match one registration
+          break
 
   def set_closed_user_group(self, in_group):
     "Set the closed user group status of a user"
