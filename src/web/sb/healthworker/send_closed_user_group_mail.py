@@ -60,7 +60,7 @@ def main():
     if True or health_workers:
       dataset = tablib.Dataset(
         *[(fix_phone(i.vodacom_phone), i.surname or u"") for i in health_workers],
-        headers=["phone_number", "name"])
+        headers=["phone", "name"])
       email = EmailMessage(u"Closed User Group Request %s" % (now, ),
                            u"Please add the attached users to the closed user group.  Thanks!",
                            opts.src_email,
