@@ -323,3 +323,9 @@ class MCTRegistration(models.Model):
   def __unicode__(self):
     return self.name
 
+class DataSet(models.Model):
+  key = models.CharField(null=False, blank=False)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+
+
