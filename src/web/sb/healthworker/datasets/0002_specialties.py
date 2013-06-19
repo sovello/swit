@@ -10,9 +10,11 @@ from sb.healthworker import models
 from sb.testing import is_testing
 import sb.healthworker
 
-def import_specialties():
+from sb.healthworker.datasets import _helpers
+
+def run():
   pkg_dir = os.path.split(sb.healthworker.__file__)[0]
-  specialties_txt = os.path.join(pkg_dir, 'migrations', 'specialties.txt')
+  specialties_txt = _helpers.get_path('specialties.txt')
   fields = []
   cadre = None
   specialty = None
@@ -45,11 +47,4 @@ def import_specialties():
           assert specialty is not None
           super_specialty.parent_specialty = specialty
           super_specialty.save()
-
-class Migration(SchemaMigration):
-
-    def forwards(self, orm):
-      if is_testing():
-        return
-      import_specialties()
 

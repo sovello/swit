@@ -324,8 +324,7 @@ class MCTRegistration(models.Model):
     return self.name
 
 class DataSet(models.Model):
-  key = models.CharField(null=False, blank=False)
+  key = models.CharField(null=False, blank=False, max_length=128)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
   created_at = models.DateTimeField(auto_now_add=True)
-
 
