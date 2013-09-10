@@ -1,0 +1,68 @@
+Documentation from Praekelt on the Redis backup containing event data:
+
+Attached is a file containing a complete backup of the current state 
+of the sandbox key-value store used by Kali's account inside Vumi Go.  
+The overall format of the file is newline separate JSON -- i.e. each 
+line is a JSON-formatted record. It's vaguely human-readable once one 
+unzips it using gzip.  The first line of the file is a header that describes the backup. 
+The remain lines each contain one record from the key-value store.  
+We're mostly interested in records with keys that start with "users." 
+-- these hold the current state for each user of the Switchboard menu 
+[1]. A typical record looks like:  
+
+{   
+	"type": "string",   
+	"value": ...   
+	"key": "users.+255752004823",   
+	"ttl": null 
+}
+
+The interesting items are the key and the value. The key is 
+"users.<MSISDN>". The value we will get to shortly. The type is always 
+"string" and ttl stands for "time-to-live" and is how long before the 
+key will be deleted by redis (null means never).  
+
+The value is itself JSON (so it is double-encoded as JSON to start 
+with) and contains the following:  
+
+{
+	"lang": "sw",   
+	"current_state": "cadre_unavailable_contact",   
+	"pages": {"cadre": 5},   
+	"answers": {       
+		"cadre_unavailable": "yes",       
+		"cadre": "other",       
+		"intro": "sw",       
+		"cadre_other": "1"   
+	},   
+	"custom": {   
+		"possible_timeouts": 1,       
+		"ussd_sessions": 2   
+	}
+ }
+
+Brief explanation of the fields:  
+
+* lang: Language selected by the user. Either "sw" (Swahili) or "en" (English).  
+* current_state: The name of the state the user was last shown (i.e. 
+where the user is in the menu). Understanding these entire might
+require reading the sandbox javascript code a bit but they do map 
+reasonably cleanly to the boxes in the flowchart of questions in the 
+scope of work. Useful for determine where about in the menu people are 
+stuck.  
+* pages: Some states within the menu require multiple screens to 
+display -- this records which page of each of those states the user 
+was last on.
+* answers: The last answer given to each state the user has provided 
+an answer for.  
+* custom: These are custom items stored specifically for Switchboard. 
+  The meanings of the sub-items are:    
+  * possible_timeouts: The number of times the remote side closed the 
+    USSD session (either because the user hit cancel or because the 
+    operator terminated the session).    
+  * ussd_sessions: Total number of USSD session start events for the user.    
+  * registered: 1 if the user is now registered, absent otherwise.  
+
+[1] There are a few records that hold temporary metric values at the 
+start of the file.
+

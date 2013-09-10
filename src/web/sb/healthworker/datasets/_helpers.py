@@ -1,6 +1,6 @@
 import csv
+import json
 import os.path
-
 
 def read_csv(path, fields=None):
   items = []
@@ -8,6 +8,12 @@ def read_csv(path, fields=None):
     reader = csv.DictReader(f, fieldnames=fields)
     items = list(reader)
   return items
+
+# Read LF terminated json
+def read_lf_json(path):
+  with open(path, 'r') as f:
+    data = f.readlines()
+  return [json.loads(line) for line in data]
 
 def get_path(*path_parts):
   return os.path.join(os.path.split(__file__)[0], *path_parts)
