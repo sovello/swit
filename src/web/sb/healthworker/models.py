@@ -58,36 +58,38 @@ class HealthWorker(models.Model):
                                            null=False,
                                            blank=True,
                                            choices=[(UNVERIFIED, u"Needs Verification"),
-                                                    (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number"),
+                                                    (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number+Name"),
                                                     (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
                                                     (MANUALLY_VERIFIED, u"Manually Verified")])
-
 
   def auto_verify(self):
     if self.verification_state != self.UNVERIFIED:
       return
-    if self.mct_payroll_num:
-      payrolls = list(MCTPayroll.objects.filter(check_number=self.mct_payroll_num).all())
-      payrolls = [p for p in payrolls if p.health_worker_id is None]
-      if payrolls:
-        for p in payrolls:
-          p.health_worker = self
-          p.save()
+
+    if self.surname and self.mct_payroll_num:
+      payrolls = MCTPayroll.objects
+      payrolls = payrolls.filter(check_number=self.mct_payroll_num).filter(health_worker_id__isnull=True)
+      payrolls = payrolls.extra(where=["edit_search(%s, healthworker_mctpayroll.name, 1)"], params=[self.surname])
+      try:
+        payroll = payrolls[0]
+        payroll.health_worker = self
+        payroll.save()
         self.verification_state = self.MCT_PAYROLL_VERIFIED
         self.save()
-    if self.mct_registration_num:
+      except IndexError:
+        pass
+    if self.surname and self.mct_registration_num:
       regs = MCTRegistration.objects
-      regs = regs.filter(registration_number=self.mct_registration_num)
-      regs = list(regs.all())
-      regs = [r for r in regs if r.health_worker_id is None]
-      if regs:
-        for r in regs:
-          r.health_worker = self
-          r.save()
-          self.verification_state = self.MCT_REGISTRATION_VERIFIED
-          self.save()
-          # Only match one registration
-          break
+      regs = regs.filter(registration_number=self.mct_registration_num).filter(health_worker_id__isnull=True)
+      regs = regs.extra(where=["edit_search(%s, healthworker_mctregistration.name, 1)"], params=[self.surname])
+      try:
+        reg = regs[0]
+        reg.health_worker = self
+        reg.save()
+        self.verification_state = self.MCT_REGISTRATION_VERIFIED
+        self.save()
+      except IndexError:
+        pass
 
   def set_closed_user_group(self, in_group):
     "Set the closed user group status of a user"
