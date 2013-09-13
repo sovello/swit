@@ -323,6 +323,85 @@ class MCTRegistration(models.Model):
   def __unicode__(self):
     return self.name
 
+# Data provided by Vumi on the current state of each user
+class RegistrationStatus(models.Model):
+  # USSD States
+  INTRO = 0
+  NO_VODACOM_SIM = 1
+  CADRE = 2
+  CADRE_OTHER = 3
+  CADRE_UNAVAILABLE = 4
+  CADRE_UNAVAILABLE_CONTACT = 5
+  CADRE_UNAVAILABLE_DONT_CONTACT = 6
+  CHECK_NUMBER = 7 # cheque_number
+  REGISTRATION_NUMBER = 8
+  DATE_OF_BIRTH = 9 # this state has been disabled
+  DONT_MATCH_MCT = 10
+  DONT_MATCH_MCT_END = 11
+  FIRST_NAME = 12
+  LAST_NAME = 13 # surname
+  TERMS = 14 # terms_and_conditions
+  SESSION1_END = 15
+  SESSION1_ABORT_YN = 16
+  SESSION1_ABORT = 17
+  SESSION2_INTRO = 18
+  DISTRICT_SELECT = 19
+  DISTRICT_REENTER = 20
+  FACILITY_TYPE = 21
+  FACILITY_NAME = 22
+  FACILITY_SELECT = 23
+  SELECT_SPECIALTY = 24
+  EMAIL = 25 # this state has been disabled
+  SESSION2_END = 26
+  END = 27 # apparently a legacy state, not really used
+
+  USSD_STATES = [
+      (INTRO, u"1. Choose Language - Session 1 Intro"),
+      (NO_VODACOM_SIM, u"Not a Vodacom Customer (ABORT)"),
+      (CADRE, u"2. Choose Cadre"),
+      (CADRE_OTHER, u"2a. Enter Other Cadre"),
+      (CADRE_UNAVAILABLE, u"2b. Cadre Unavailable"),
+      (CADRE_UNAVAILABLE_CONTACT, u"2c. Cadre Unavailable - Please Contact (ABORT)"),
+      (CADRE_UNAVAILABLE_DONT_CONTACT, u"2d. Cadre Unavailable - Don't Contact (ABORT)"),
+      (CHECK_NUMBER, u"3. Enter Check Number"),
+      (REGISTRATION_NUMBER, u"3a. Enter Registration Number"),
+      (DATE_OF_BIRTH, u"Enter Date of Birth (LEGACY)"),
+      (DONT_MATCH_MCT, u"3b. Info didn't match - try again?"),
+      (DONT_MATCH_MCT_END, u"3c. Info didn't match (ABORT)"),
+      (FIRST_NAME, u"4. Enter First name"),
+      (LAST_NAME, u"5. Enter Last name"),
+      (TERMS, u"6. Accept Terms and conditions?"),
+      (SESSION1_END, u"7. Session 1 Ended Normally"),
+      (SESSION1_ABORT_YN, u"6b. Terms declined. Are you sure?"),
+      (SESSION1_ABORT, u"6c. Terms declined (ABORT)"),
+      (SESSION2_INTRO, u"8. Enter district - Session 2 Intro"),
+      (DISTRICT_SELECT, u"8a. Select district"),
+      (DISTRICT_REENTER, u"8b. District unknown, please re-enter"),
+      (FACILITY_TYPE, u"9. Select facility type"),
+      (FACILITY_NAME, u"10. Enter facility name"),
+      (FACILITY_SELECT, u"10a. Select facility"),
+      (SELECT_SPECIALTY, u"11. Select speciality"),
+      (EMAIL, u"Enter email address (LEGACY)"),
+      (SESSION2_END, u"12. Session 2 ended normally"),
+      (END, u"End (LEGACY)")]
+
+  msisdn = models.CharField(max_length=255, blank=False, db_index=True, unique=True)
+  last_state = models.IntegerField(blank=False, choices=USSD_STATES)
+  num_ussd_sessions = models.IntegerField(null=True, blank=True)
+  num_possible_timeouts = models.IntegerField(null=True, blank=True)
+  registered = models.BooleanField(default=False)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+# The individual answers to each question
+class RegistrationAnswer(models.Model):
+  msisdn = models.CharField(max_length=255, blank=False)
+  question = models.IntegerField(blank=False, choices=RegistrationStatus.USSD_STATES)
+  answer = models.CharField(max_length=255, blank=True)
+  page = models.IntegerField(null=True, blank=True) # some questions are multi-page, this is the last page they saw
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
 class DataSet(models.Model):
   key = models.CharField(null=False, blank=False, max_length=128)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)

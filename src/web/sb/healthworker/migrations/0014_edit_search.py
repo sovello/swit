@@ -42,11 +42,9 @@ $$ language plpgsql;
 
 class Migration(SchemaMigration):
   def forwards(self, orm):
-    db.execute("create extension fuzzystrmatch")
     db.execute(drop_fn_sql)
     db.execute(create_fn_sql)
 
   def backwards(self, orm):
     db.execute(drop_fn_sql)
-    db.execute("drop extension fuzzystrmatch")
 

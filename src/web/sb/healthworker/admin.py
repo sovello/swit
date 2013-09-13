@@ -36,6 +36,14 @@ class HealthWorkerAdmin(admin.ModelAdmin):
   list_display = ["name", "created_at", "updated_at", "mct_registration_num", "mct_payroll_num", "email", "verification_state", "vodacom_phone", "is_closed_user_group", "request_closed_user_group_at", "added_to_closed_user_group_at"]
   search_fields = ["name", "vodacom_phone", "email", "mct_registration_num", "mct_payroll_num"]
 
+class RegistrationStatusAdmin(admin.ModelAdmin):
+  list_display = ["msisdn", "last_state", "num_ussd_sessions", "num_possible_timeouts", "registered"]
+  search_fields = ["msisdn", "last_state", "num_ussd_sessions", "num_possible_timeouts", "registered"]
+
+class RegistrationAnswerAdmin(admin.ModelAdmin):
+  list_display = ["msisdn", "question", "answer", "page"]
+  search_fields = ["msisdn", "question"]
+
 admin.site.register(models.Facility, FacilityAdmin)
 admin.site.register(models.FacilityType)
 admin.site.register(models.HealthWorker, HealthWorkerAdmin)
@@ -44,3 +52,5 @@ admin.site.register(models.MCTPayroll, MCTPayrollAdmin)
 admin.site.register(models.Region, RegionAdmin)
 admin.site.register(models.RegionType)
 admin.site.register(models.Specialty)
+admin.site.register(models.RegistrationStatus, RegistrationStatusAdmin)
+admin.site.register(models.RegistrationAnswer, RegistrationAnswerAdmin)
