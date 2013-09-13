@@ -18,24 +18,34 @@ class AutoVerifyTest(TestCase):
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
-    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234') as hw, \
-        temp_obj(MCTRegistration, registration_number='1234') as mct:
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', surname='Bickford') as hw, \
+        temp_obj(MCTRegistration, registration_number='1234', name='Brandon Bickford') as mct:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_REGISTRATION_VERIFIED)
+
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', surname='Bickford') as hw, \
+       temp_obj(MCTRegistration, registration_number='1234', name='Curt Johnson') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
     with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1235') as hw, \
        temp_obj(MCTRegistration, registration_number='1234') as mct:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
-    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', mct_payroll_num='4567') as hw, \
-        temp_obj(MCTPayroll, check_number='4567') as payroll:
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', mct_payroll_num='4567', surname='Bickford') as hw, \
+        temp_obj(MCTPayroll, check_number='4567', name='Brandon Bickford') as payroll:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_PAYROLL_VERIFIED)
 
-    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', mct_payroll_num='4567') as hw, \
-       temp_obj(MCTPayroll, check_number='4567') as payroll, \
-       temp_obj(MCTRegistration, registration_number='1234') as reg:
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', mct_payroll_num='4567', surname='Bickford') as hw, \
+        temp_obj(MCTPayroll, check_number='4567', name='Curt Johnson') as payroll:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
+
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', mct_payroll_num='4567', surname='Bickford') as hw, \
+       temp_obj(MCTPayroll, check_number='4567', name='Curt Johnson') as payroll, \
+       temp_obj(MCTRegistration, registration_number='1234', name='Brandon Bickford') as reg:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_REGISTRATION_VERIFIED)
 
