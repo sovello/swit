@@ -33,6 +33,8 @@ class Command(BaseCommand):
       item['is_closed_user_group'] = hw.is_closed_user_group
       item['gender'] = hw.gender
       item['email'] = hw.email
+      item['mct_registration_num'] = hw.mct_registration_num
+      item['mct_payroll_num'] = hw.mct_payroll_num
       item['verification_state'] = hw.verification_state
       item['created_at'] = fmt_date(hw.created_at)
       items.append(item)
