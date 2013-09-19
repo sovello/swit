@@ -58,7 +58,7 @@ class HealthWorker(models.Model):
                                            null=False,
                                            blank=True,
                                            choices=[(UNVERIFIED, u"Needs Verification"),
-                                                    (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number+Name"),
+                                                    (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number"),
                                                     (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
                                                     (MANUALLY_VERIFIED, u"Manually Verified")])
 
@@ -66,10 +66,9 @@ class HealthWorker(models.Model):
     if self.verification_state != self.UNVERIFIED:
       return
 
-    if self.surname and self.mct_payroll_num:
+    if self.mct_payroll_num:
       payrolls = MCTPayroll.objects
       payrolls = payrolls.filter(check_number=self.mct_payroll_num).filter(health_worker_id__isnull=True)
-      payrolls = payrolls.extra(where=["edit_search(%s, healthworker_mctpayroll.name, 1)"], params=[self.surname])
       try:
         payroll = payrolls[0]
         payroll.health_worker = self
@@ -81,7 +80,7 @@ class HealthWorker(models.Model):
     if self.surname and self.mct_registration_num:
       regs = MCTRegistration.objects
       regs = regs.filter(registration_number=self.mct_registration_num).filter(health_worker_id__isnull=True)
-      regs = regs.extra(where=["edit_search(%s, healthworker_mctregistration.name, 1)"], params=[self.surname])
+      regs = regs.extra(where=["edit_search(%s, healthworker_mctregistration.name, 2)"], params=[self.surname])
       try:
         reg = regs[0]
         reg.health_worker = self
