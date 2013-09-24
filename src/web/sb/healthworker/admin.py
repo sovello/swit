@@ -89,6 +89,10 @@ class DMORegistrationAdmin(admin.ModelAdmin):
   list_display = ["name", "phone_number", "email", "registration_type", "registration_number", "check_number", "cadre", "city", "district", "region", "gender", "nationality", "duty_station", "department"]
   search_fields = ["name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
 
+class NGORegistrationAdmin(admin.ModelAdmin):
+  list_display = ["ngo", "list_num", "name", "cadre", "city", "region", "district", "duty_station", "phone_number", "alt_phone_number", "check_number", "registration_number", "email"]
+  search_fields = ["ngo", "list_num", "name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
+
 class HealthWorkerAdmin(admin.ModelAdmin):
   def specialties(self, hw):
     u', '.join([s.title for s in hw.specialties.all()])
@@ -121,6 +125,8 @@ admin.site.register(models.HealthWorker, HealthWorkerAdmin)
 admin.site.register(models.MCTRegistration, MCTRegistrationAdmin)
 admin.site.register(models.MCTPayroll, MCTPayrollAdmin)
 admin.site.register(models.DMORegistration, DMORegistrationAdmin)
+admin.site.register(models.NGO)
+admin.site.register(models.NGORegistration, NGORegistrationAdmin)
 admin.site.register(models.Region, RegionAdmin)
 admin.site.register(models.RegionType)
 admin.site.register(models.Specialty, SpecialtyAdmin)

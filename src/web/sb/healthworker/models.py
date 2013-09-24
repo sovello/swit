@@ -351,6 +351,46 @@ class DMORegistration(models.Model):
   def __unicode__(self):
     return self.name
 
+# Partner NGOs
+class NGO(models.Model):
+  name = models.CharField(max_length=255, null=True, blank=False)
+
+  @classmethod
+  def get_or_create_by_name(cls, name):
+    if not name:
+      return None
+    try:
+      return cls.objects.get(name__iexact=name)
+    except cls.DoesNotExist:
+      o = cls()
+      o.name = name
+      o.save()
+      return o
+
+  def __unicode__(self):
+    return self.name
+
+# Data provided by partner NGOs
+class NGORegistration(models.Model):
+  health_worker = models.ForeignKey(HealthWorker, null=True, blank=True, db_index=True)
+  ngo = models.ForeignKey(NGO, null=True, blank=False, db_index=True)
+  list_num = models.IntegerField(null=True, blank=False)
+  name = models.CharField(max_length=255, null=True, blank=False)
+  cadre = models.CharField(max_length=255, null=True, blank=True)
+  city = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  region = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  district = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  duty_station = models.CharField(max_length=255, null=True, blank=True)
+  phone_number = models.CharField(max_length=255, null=True, blank=True)
+  alt_phone_number = models.CharField(max_length=255, null=True, blank=True)
+  check_number = models.CharField(max_length=255, null=True, blank=True)
+  registration_number = models.CharField(max_length=255, null=True, blank=True)
+  email = models.EmailField(null=True, blank=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+  def __unicode__(self):
+    return self.name
+
 # Data provided by Vumi on the current state of each user
 class RegistrationStatus(models.Model):
   # USSD States
