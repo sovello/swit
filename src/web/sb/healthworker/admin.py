@@ -85,6 +85,10 @@ class MCTRegistrationAdmin(admin.ModelAdmin):
   list_display = ["name", "address", "birthdate", "cadre", "category", "country", "current_employer", "dates_of_registration_full", "dates_of_registration_temporary", "dates_of_registration_provisional", "email", "employer_during_internship", "facility", "file_number", "health_worker", "qualification_final", "qualification_provisional", "qualification_specialization_1", "qualification_specialization_2", "registration_number", "registration_type", "specialty", "specialty_duration", "created_at", "updated_at"]
   search_fields = ["name", "address", "birthdate", "cadre", "category", "country", "current_employer", "dates_of_registration_full", "dates_of_registration_temporary", "dates_of_registration_provisional", "email", "employer_during_internship", "file_number", "qualification_final", "qualification_provisional", "qualification_specialization_1", "qualification_specialization_2", "registration_number", "registration_type", "specialty_duration"]
 
+class DMORegistrationAdmin(admin.ModelAdmin):
+  list_display = ["name", "phone_number", "email", "registration_type", "registration_number", "check_number", "cadre", "city", "district", "region", "gender", "nationality", "duty_station", "department"]
+  search_fields = ["name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
+
 class HealthWorkerAdmin(admin.ModelAdmin):
   def specialties(self, hw):
     u', '.join([s.title for s in hw.specialties.all()])
@@ -116,6 +120,7 @@ admin.site.register(models.FacilityType)
 admin.site.register(models.HealthWorker, HealthWorkerAdmin)
 admin.site.register(models.MCTRegistration, MCTRegistrationAdmin)
 admin.site.register(models.MCTPayroll, MCTPayrollAdmin)
+admin.site.register(models.DMORegistration, DMORegistrationAdmin)
 admin.site.register(models.Region, RegionAdmin)
 admin.site.register(models.RegionType)
 admin.site.register(models.Specialty, SpecialtyAdmin)

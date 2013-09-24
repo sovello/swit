@@ -281,6 +281,7 @@ def get_or_create_by_title(model, title):
     o.save()
     return o
 
+# Data provided by MCT payroll list
 class MCTPayroll(models.Model):
   last_name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
   name = models.CharField(max_length=255, null=True, blank=True, db_index=True)
@@ -293,6 +294,7 @@ class MCTPayroll(models.Model):
   facility = models.ForeignKey(Facility, null=True, blank=True, db_index=True)
   region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
 
+# Data provided by MCT registration list
 class MCTRegistration(models.Model):
   address = models.TextField(null=True, blank=True)
   birthdate = models.DateField(null=True, blank=True)
@@ -320,6 +322,31 @@ class MCTRegistration(models.Model):
   specialty = models.CharField(max_length=255, null=True, blank=True)
   specialty_duration = models.CharField(max_length=255, null=True, blank=True)
   updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+  def __unicode__(self):
+    return self.name
+
+# Data provided by DMO registration list
+class DMORegistration(models.Model):
+  # Useful for autoverify
+  name = models.CharField(max_length=255, null=True, blank=False)
+  phone_number = models.CharField(max_length=255, null=True, blank=True)
+  registration_type = models.CharField(max_length=2, null=True, blank=True)
+  registration_number = models.CharField(max_length=255, null=True, blank=True)
+  check_number = models.CharField(max_length=255, null=True, blank=True)
+  health_worker = models.ForeignKey(HealthWorker, null=True, blank=True, db_index=True)
+  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+  # Not really used, but import it anyway, might want it at some point
+  cadre = models.CharField(max_length=255, null=True, blank=True)
+  email = models.EmailField(null=True, blank=True)
+  city = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  district = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  region = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+  nationality = models.CharField(max_length=255, null=True, blank=True)
+  gender = models.CharField(max_length=255, null=True, blank=True)
+  duty_station = models.CharField(max_length=255, null=True, blank=True)
+  department = models.CharField(max_length=255, null=True, blank=True)
 
   def __unicode__(self):
     return self.name
