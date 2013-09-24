@@ -33,7 +33,7 @@ def import_new_entry(item):
 
   # Ignore records with no name
   worker.name = ' '.join(filter(bool, [item["FirstName"], item["MiddleName"], item["LastName"]]))
-  if worker.name is None or len(worker.name) == 0:
+  if not worker.name:
     return
 
   worker.phone_number = parse_phone_number(item["Vodacom"])
