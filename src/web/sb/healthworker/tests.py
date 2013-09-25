@@ -96,6 +96,43 @@ class AutoVerifyTest(TestCase):
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
+  def test_name(self):
+    # name match MCTRegistration (success)
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', name='Brandon Bickford') as hw, \
+        temp_obj(MCTRegistration, name='Brandon Bickford') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.NAME_VERIFIED)
+
+    # name match DMORegistration (success)
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', name='Brandon Bickford') as hw, \
+        temp_obj(DMORegistration, name='Brandon Bickford') as dmo:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.NAME_VERIFIED)
+
+    # name match NGORegistration (success)
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', name='Brandon Bickford') as hw, \
+        temp_obj(NGORegistration, name='Brandon Bickford') as dmo:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.NAME_VERIFIED)
+
+    # name mismatch
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', name='Jim Johnson') as hw, \
+       temp_obj(MCTRegistration, name='Brandon Bickford') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
+
+    # name close enough
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', name='Brandon Bickford') as hw, \
+       temp_obj(MCTRegistration, name='Brandon Bickfords') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.NAME_VERIFIED)
+
+    # names in different order ok too
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', name='Brandon Samson Bickford') as hw, \
+       temp_obj(MCTRegistration, name='Bickford Brandon Samson') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.NAME_VERIFIED)
+
 @contextlib.contextmanager
 def temp_obj(django_type, **attrs):
   o = django_type()

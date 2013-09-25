@@ -54,6 +54,7 @@ class HealthWorker(models.Model):
   MCT_REGISTRATION_VERIFIED = 2
   MANUALLY_VERIFIED = 3
   PHONE_NUMBER_VERIFIED = 4
+  NAME_VERIFIED = 5
 
   verification_state = models.IntegerField(default=0,
                                            null=False,
@@ -62,6 +63,7 @@ class HealthWorker(models.Model):
                                                     (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number"),
                                                     (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
                                                     (PHONE_NUMBER_VERIFIED, u"Verified By Phone Number"),
+                                                    (NAME_VERIFIED, u"Verified By Name"),
                                                     (MANUALLY_VERIFIED, u"Manually Verified")])
 
   def auto_verify(self):
@@ -81,6 +83,11 @@ class HealthWorker(models.Model):
     # Phone number check
     data_sources = [DMORegistration, NGORegistration]
     if filter(bool, [self.verify_phone_number(cls) for cls in data_sources]):
+      return
+
+    # Name check
+    data_sources = [MCTPayroll, MCTRegistration, DMORegistration, NGORegistration]
+    if filter(bool, [self.verify_name(cls) for cls in data_sources]):
       return
 
   # We have payroll data from multiple sources. This checks against
@@ -145,6 +152,28 @@ class HealthWorker(models.Model):
     record.save()
 
     self.verification_state = self.PHONE_NUMBER_VERIFIED
+    self.save()
+    return True
+
+  # We have name data from multiple sources. This checks against
+  # the given source and returns a bool
+  def verify_name(self, cls):
+    if not self.name:
+      return False
+
+    records = cls.objects
+    records = records.filter(health_worker_id__isnull=True)
+    name_search = "edit_search(%%s, %s.name, 2)" % cls._meta.db_table
+    records = records.extra(where=[name_search], params=[self.name])
+    records = list(records[:1])
+    if not records:
+      return False
+
+    record = records[0]
+    record.health_worker = self
+    record.save()
+
+    self.verification_state = self.NAME_VERIFIED
     self.save()
     return True
 
