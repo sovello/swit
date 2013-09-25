@@ -6,6 +6,12 @@ from django.db import transaction
 from sb.healthworker.datasets import _helpers
 from sb.healthworker.models import NGO, NGORegistration
 
+def format_phone_number(phone_number):
+  phone_number = re.sub('[\s\.-]', '', phone_number)
+  if not phone_number.startswith('+'):
+    phone_number = "+%s" % phone_number
+  return phone_number
+
 #First Name,Middle Name,Last Name,Cadre,District,Duty Station,Vodacom #,Other Tel #,Payroll #,MCT License #,E-mail,Town/City,Region,NGO
 def import_new_entry(item, ngo, list_num):
   # Strip all values of leading and trailing whitespace
@@ -23,8 +29,8 @@ def import_new_entry(item, ngo, list_num):
   worker.cadre = item["Cadre"]
   worker.district = item["District"]
   worker.duty_station = item["Duty Station"]
-  worker.phone_number = re.sub('[\s\.-]', '', item["Vodacom #"])
-  worker.alt_phone_number = re.sub('[\s\.-]', '', item["Other Tel #"])
+  worker.phone_number = format_phone_number(item["Vodacom #"])
+  worker.alt_phone_number = format_phone_number(item["Other Tel #"])
   worker.check_number = item["Payroll #"]
   worker.registration_number = item["MCT License #"]
   if worker.registration_number == 'Licensed': # bad data

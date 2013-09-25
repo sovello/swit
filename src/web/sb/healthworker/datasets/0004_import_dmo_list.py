@@ -21,7 +21,7 @@ def parse_registration_number(reg_number):
 
 def parse_phone_number(phone_number):
   if phone_number:
-    return "255%s" % (phone_number)
+    return "+255%s" % (phone_number)
 
 def import_new_entry(item):
   # Strip all values of leading and trailing whitespace
