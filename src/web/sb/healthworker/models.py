@@ -66,29 +66,55 @@ class HealthWorker(models.Model):
     if self.verification_state != self.UNVERIFIED:
       return
 
+    # Payroll number check
     if self.mct_payroll_num:
-      payrolls = MCTPayroll.objects
-      payrolls = payrolls.filter(check_number=self.mct_payroll_num).filter(health_worker_id__isnull=True)
-      try:
-        payroll = payrolls[0]
-        payroll.health_worker = self
-        payroll.save()
-        self.verification_state = self.MCT_PAYROLL_VERIFIED
-        self.save()
-      except IndexError:
-        pass
+      data_sources = [MCTPayroll, DMORegistration, NGORegistration]
+      if filter(bool, [self.verify_payroll_num(cls) for cls in data_sources]):
+        return
+
+    # Registration number check
     if self.surname and self.mct_registration_num:
-      regs = MCTRegistration.objects
-      regs = regs.filter(registration_number=self.mct_registration_num).filter(health_worker_id__isnull=True)
-      regs = regs.extra(where=["edit_search(%s, healthworker_mctregistration.name, 2)"], params=[self.surname])
-      try:
-        reg = regs[0]
-        reg.health_worker = self
-        reg.save()
-        self.verification_state = self.MCT_REGISTRATION_VERIFIED
-        self.save()
-      except IndexError:
-        pass
+      data_sources = [MCTRegistration, DMORegistration, NGORegistration]
+      if filter(bool, [self.verify_registration_num(cls) for cls in data_sources]):
+        return
+
+  # We have payroll data from multiple sources. This checks against
+  # the given source and returns a bool
+  def verify_payroll_num(self, cls):
+    payrolls = cls.objects
+    payrolls = payrolls.filter(check_number=self.mct_payroll_num)
+    payrolls = payrolls.filter(health_worker_id__isnull=True)
+    payrolls = list(payrolls[:1])
+    if not payrolls:
+      return False
+
+    payroll = payrolls[0]
+    payroll.health_worker = self
+    payroll.save()
+
+    self.verification_state = self.MCT_PAYROLL_VERIFIED
+    self.save()
+    return True
+
+  # We have registration number data from multiple sources. This checks against
+  # the given source and returns a bool
+  def verify_registration_num(self, cls):
+    regs = cls.objects
+    regs = regs.filter(registration_number=self.mct_registration_num)
+    regs = regs.filter(health_worker_id__isnull=True)
+    name_search = "edit_search(%%s, %s.name, 2)" % cls._meta.db_table
+    regs = regs.extra(where=[name_search], params=[self.surname])
+    regs = list(regs[:1])
+    if not regs:
+      return False
+
+    reg = regs[0]
+    reg.health_worker = self
+    reg.save()
+
+    self.verification_state = self.MCT_REGISTRATION_VERIFIED
+    self.save()
+    return True
 
   def set_closed_user_group(self, in_group):
     "Set the closed user group status of a user"
