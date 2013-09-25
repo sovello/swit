@@ -53,6 +53,7 @@ class HealthWorker(models.Model):
   MCT_PAYROLL_VERIFIED = 1
   MCT_REGISTRATION_VERIFIED = 2
   MANUALLY_VERIFIED = 3
+  PHONE_NUMBER_VERIFIED = 4
 
   verification_state = models.IntegerField(default=0,
                                            null=False,
@@ -60,6 +61,7 @@ class HealthWorker(models.Model):
                                            choices=[(UNVERIFIED, u"Needs Verification"),
                                                     (MCT_PAYROLL_VERIFIED, u"Verified By MCT Payroll Number"),
                                                     (MCT_REGISTRATION_VERIFIED, u"Verified By MCT Registration Number+Name"),
+                                                    (PHONE_NUMBER_VERIFIED, u"Verified By Phone Number"),
                                                     (MANUALLY_VERIFIED, u"Manually Verified")])
 
   def auto_verify(self):
@@ -67,30 +69,36 @@ class HealthWorker(models.Model):
       return
 
     # Payroll number check
-    if self.mct_payroll_num:
-      data_sources = [MCTPayroll, DMORegistration, NGORegistration]
-      if filter(bool, [self.verify_payroll_num(cls) for cls in data_sources]):
-        return
+    data_sources = [MCTPayroll, DMORegistration, NGORegistration]
+    if filter(bool, [self.verify_payroll_num(cls) for cls in data_sources]):
+      return
 
     # Registration number check
-    if self.surname and self.mct_registration_num:
-      data_sources = [MCTRegistration, DMORegistration, NGORegistration]
-      if filter(bool, [self.verify_registration_num(cls) for cls in data_sources]):
-        return
+    data_sources = [MCTRegistration, DMORegistration, NGORegistration]
+    if filter(bool, [self.verify_registration_num(cls) for cls in data_sources]):
+      return
+
+    # Phone number check
+    data_sources = [DMORegistration, NGORegistration]
+    if filter(bool, [self.verify_phone_number(cls) for cls in data_sources]):
+      return
 
   # We have payroll data from multiple sources. This checks against
   # the given source and returns a bool
   def verify_payroll_num(self, cls):
-    payrolls = cls.objects
-    payrolls = payrolls.filter(check_number=self.mct_payroll_num)
-    payrolls = payrolls.filter(health_worker_id__isnull=True)
-    payrolls = list(payrolls[:1])
-    if not payrolls:
+    if not self.mct_payroll_num:
       return False
 
-    payroll = payrolls[0]
-    payroll.health_worker = self
-    payroll.save()
+    records = cls.objects
+    records = records.filter(check_number=self.mct_payroll_num)
+    records = records.filter(health_worker_id__isnull=True)
+    records = list(records[:1])
+    if not records:
+      return False
+
+    record = records[0]
+    record.health_worker = self
+    record.save()
 
     self.verification_state = self.MCT_PAYROLL_VERIFIED
     self.save()
@@ -99,20 +107,44 @@ class HealthWorker(models.Model):
   # We have registration number data from multiple sources. This checks against
   # the given source and returns a bool
   def verify_registration_num(self, cls):
-    regs = cls.objects
-    regs = regs.filter(registration_number=self.mct_registration_num)
-    regs = regs.filter(health_worker_id__isnull=True)
-    name_search = "edit_search(%%s, %s.name, 2)" % cls._meta.db_table
-    regs = regs.extra(where=[name_search], params=[self.surname])
-    regs = list(regs[:1])
-    if not regs:
+    if not self.surname or not self.mct_registration_num:
       return False
 
-    reg = regs[0]
-    reg.health_worker = self
-    reg.save()
+    records = cls.objects
+    records = records.filter(registration_number=self.mct_registration_num)
+    records = records.filter(health_worker_id__isnull=True)
+    name_search = "edit_search(%%s, %s.name, 2)" % cls._meta.db_table
+    records = records.extra(where=[name_search], params=[self.surname])
+    records = list(records[:1])
+    if not records:
+      return False
+
+    record = records[0]
+    record.health_worker = self
+    record.save()
 
     self.verification_state = self.MCT_REGISTRATION_VERIFIED
+    self.save()
+    return True
+
+  # We have phone number data from multiple sources. This checks against
+  # the given source and returns a bool
+  def verify_phone_number(self, cls):
+    if not self.vodacom_phone:
+      return False
+
+    records = cls.objects
+    records = records.filter(phone_number=self.vodacom_phone)
+    records = records.filter(health_worker_id__isnull=True)
+    records = list(records[:1])
+    if not records:
+      return False
+
+    record = records[0]
+    record.health_worker = self
+    record.save()
+
+    self.verification_state = self.PHONE_NUMBER_VERIFIED
     self.save()
     return True
 

@@ -24,13 +24,13 @@ class AutoVerifyTest(TestCase):
 
     # number and name match DMORegistration (success)
     with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', surname='Bickford') as hw, \
-        temp_obj(DMORegistration, registration_number='1234', name='Brandon Bickford') as mct:
+        temp_obj(DMORegistration, registration_number='1234', name='Brandon Bickford') as dmo:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_REGISTRATION_VERIFIED)
 
     # number and name match NGORegistration (success)
     with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_registration_num='1234', surname='Bickford') as hw, \
-        temp_obj(NGORegistration, registration_number='1234', name='Brandon Bickford') as mct:
+        temp_obj(NGORegistration, registration_number='1234', name='Brandon Bickford') as ngo:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_REGISTRATION_VERIFIED)
 
@@ -61,19 +61,38 @@ class AutoVerifyTest(TestCase):
 
     # number matches DMORegistration (success)
     with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_payroll_num='4567') as hw, \
-        temp_obj(DMORegistration, check_number='4567') as payroll:
+        temp_obj(DMORegistration, check_number='4567') as dmo:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_PAYROLL_VERIFIED)
 
     # number matches NGORegistration (success)
     with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_payroll_num='4567') as hw, \
-        temp_obj(NGORegistration, check_number='4567') as payroll:
+        temp_obj(NGORegistration, check_number='4567') as ngo:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.MCT_PAYROLL_VERIFIED)
 
     # number doesn't match
     with temp_obj(HealthWorker, email='bickfordb@gmail.com', mct_payroll_num='4567') as hw, \
         temp_obj(MCTPayroll, check_number='1111') as payroll:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
+
+  def test_phone_number(self):
+    # number matches DMORegistration (success)
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', vodacom_phone='255768328988') as hw, \
+        temp_obj(DMORegistration, phone_number='255768328988') as dmo:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.PHONE_NUMBER_VERIFIED)
+
+    # number matches NGORegistration (success)
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', vodacom_phone='255768328988') as hw, \
+        temp_obj(NGORegistration, phone_number='255768328988') as ngo:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.PHONE_NUMBER_VERIFIED)
+
+    # number doesn't match
+    with temp_obj(HealthWorker, email='bickfordb@gmail.com', vodacom_phone='255768328988') as hw, \
+        temp_obj(MCTPayroll, check_number='255111111111') as payroll:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
