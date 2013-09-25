@@ -8,7 +8,7 @@ from sb.healthworker.models import NGO, NGORegistration
 
 def format_phone_number(phone_number):
   phone_number = re.sub('[\s\.-]', '', phone_number)
-  if not phone_number.startswith('+'):
+  if phone_number and not phone_number.startswith('+'):
     phone_number = "+%s" % phone_number
   return phone_number
 
