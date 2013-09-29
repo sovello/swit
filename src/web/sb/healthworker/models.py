@@ -86,9 +86,9 @@ class HealthWorker(models.Model):
       return
 
     # Name check
-    data_sources = [MCTPayroll, MCTRegistration, DMORegistration, NGORegistration]
-    if filter(bool, [self.verify_name(cls) for cls in data_sources]):
-      return
+    #data_sources = [MCTPayroll, MCTRegistration, DMORegistration, NGORegistration]
+    #if filter(bool, [self.verify_name(cls) for cls in data_sources]):
+    #  return
 
   # We have payroll data from multiple sources. This checks against
   # the given source and returns a bool

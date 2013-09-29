@@ -57,18 +57,19 @@ def main():
       if not h.request_closed_user_group_at:
           h.request_closed_user_group_at = now
           h.save()
-    if True or health_workers:
-      dataset = tablib.Dataset(
-        *[(fix_phone(i.vodacom_phone), i.surname or u"") for i in health_workers],
-        headers=["phone", "name"])
-      email = EmailMessage(u"Closed User Group Request %s" % (now, ),
-                           u"Please add the attached users to the closed user group.  Thanks!",
-                           opts.src_email,
-                           [opts.dst_email],
-                           cc=opts.cc_email if opts.cc_email else None)
-      filename = now.strftime("cug-request-%Y%m%d-%H%M%S.xls")
-      email.attach(filename, dataset.xls, "application/vnd.ms-excel")
-      email.send()
+
+    # Compose xls and send it
+    dataset = tablib.Dataset(
+      *[(fix_phone(i.vodacom_phone), i.surname or u"") for i in health_workers],
+      headers=["phone", "name"])
+    email = EmailMessage(u"Closed User Group Request %s" % (now, ),
+                         u"Please add the attached users to the closed user group.  Thanks!",
+                         opts.src_email,
+                         [opts.dst_email],
+                         cc=opts.cc_email if opts.cc_email else None)
+    filename = now.strftime("cug-request-%Y%m%d-%H%M%S.xls")
+    email.attach(filename, dataset.xls, "application/vnd.ms-excel")
+    email.send()
 
 if __name__ == "__main__":
   main()
