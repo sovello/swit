@@ -68,27 +68,30 @@ class HealthWorker(models.Model):
 
   def auto_verify(self):
     if self.verification_state != self.UNVERIFIED:
-      return
+      return True
 
     # Payroll number check
     data_sources = [MCTPayroll, DMORegistration, NGORegistration]
     if filter(bool, [self.verify_payroll_num(cls) for cls in data_sources]):
-      return
+      return True
 
     # Registration number check
     data_sources = [MCTRegistration, DMORegistration, NGORegistration]
     if filter(bool, [self.verify_registration_num(cls) for cls in data_sources]):
-      return
+      return True
 
     # Phone number check
     data_sources = [DMORegistration, NGORegistration]
     if filter(bool, [self.verify_phone_number(cls) for cls in data_sources]):
-      return
+      return True
 
     # Name check
-    #data_sources = [MCTPayroll, MCTRegistration, DMORegistration, NGORegistration]
-    #if filter(bool, [self.verify_name(cls) for cls in data_sources]):
-    #  return
+    data_sources = [MCTPayroll, MCTRegistration, DMORegistration, NGORegistration]
+    if filter(bool, [self.verify_name(cls) for cls in data_sources]):
+      return True
+
+    # All checks failed
+    return False
 
   # We have payroll data from multiple sources. This checks against
   # the given source and returns a bool
@@ -120,7 +123,7 @@ class HealthWorker(models.Model):
     records = cls.objects
     records = records.filter(registration_number=self.mct_registration_num)
     records = records.filter(health_worker_id__isnull=True)
-    name_search = "edit_search(%%s, %s.name, 2)" % cls._meta.db_table
+    name_search = "is_similar(%%s, %s.name)" % cls._meta.db_table
     records = records.extra(where=[name_search], params=[self.surname])
     records = list(records[:1])
     if not records:
@@ -161,9 +164,12 @@ class HealthWorker(models.Model):
     if not self.name:
       return False
 
+    if not all([name_part.isalpha() for name_part in self.name.split()]):
+      return False
+
     records = cls.objects
     records = records.filter(health_worker_id__isnull=True)
-    name_search = "edit_search(%%s, %s.name, 2)" % cls._meta.db_table
+    name_search = "is_similar(%%s, %s.name, 0.5)" % cls._meta.db_table
     records = records.extra(where=[name_search], params=[self.name])
     records = list(records[:1])
     if not records:
@@ -176,6 +182,18 @@ class HealthWorker(models.Model):
     self.verification_state = self.NAME_VERIFIED
     self.save()
     return True
+
+  def get_matching_name(self):
+    if self.verification_state != self.NAME_VERIFIED:
+      return None
+
+    data_sources = [MCTPayroll, MCTRegistration, DMORegistration, NGORegistration]
+    for source in data_sources:
+      records = list(source.objects.filter(health_worker_id__exact=self.id)[:1])
+      if records:
+        return records[0].name
+
+    return None
 
   def set_closed_user_group(self, in_group):
     "Set the closed user group status of a user"
