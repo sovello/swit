@@ -5,8 +5,7 @@ from sb.healthworker.models import HealthWorker, RegistrationStatus, Registratio
 
 class Command(BaseCommand):
 
-  args = ''
-  help = ''
+  help = 'Export dropoff state for users last seen on the given states'
 
   option_list = BaseCommand.option_list + (make_option('-i', '--include-states',
       action='append',
