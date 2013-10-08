@@ -164,6 +164,7 @@ class HealthWorker(models.Model):
     if not self.name:
       return False
 
+    # Ignore numeric names
     if not all([name_part.isalpha() for name_part in self.name.split()]):
       return False
 
@@ -183,6 +184,7 @@ class HealthWorker(models.Model):
     self.save()
     return True
 
+  # Helper to get the match if verified by name
   def get_matching_name(self):
     if self.verification_state != self.NAME_VERIFIED:
       return None
