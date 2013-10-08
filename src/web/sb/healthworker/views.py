@@ -28,8 +28,6 @@ OK = 0
 ERROR_INVALID_INPUT = -1
 ERROR_INVALID_PATTERN = -2
 
-MAX_EDIT_DISTANCE = 2
-
 def _log_request_json(function):
   def new_function(request):
     json = getattr(request, 'JSON', None)
@@ -74,7 +72,7 @@ def on_mct_payroll_index(request):
     mct_payroll_entries = mct_payroll_entries.filter(check_number=check)
   name = request.GET.get("name")
   if name is not None:
-    mct_payroll_entries = edit_search(mct_payroll_entries, "name", name)
+    mct_payroll_entries = include_similar(mct_payroll_entries, "name", name)
 
   mct_payroll_entries = mct_payroll_entries.all()
   mct_payroll_entries = list(mct_payroll_entries)
@@ -108,7 +106,7 @@ def on_mct_registration_index(request):
 
   name = request.GET.get("name")
   if name is not None:
-    health_workers = edit_search(health_workers, "name", name)
+    health_workers = include_similar(health_workers, "name", name)
 
   health_workers = list(health_workers.all())
   total = len(health_workers)
@@ -160,8 +158,8 @@ def _region_to_dictionary(region):
         "created_at": region.created_at,
         "updated_at": region.updated_at}
 
-def edit_search(query_set, field, value):
-  where = ["edit_search(%%s, %s, %d)" % (field, MAX_EDIT_DISTANCE, )]
+def include_similar(query_set, field, value):
+  where = ["is_similar(%%s, %s)" % field]
   where_params = [value]
   return query_set.extra(where=where, params=where_params)
 
@@ -175,8 +173,6 @@ def on_region_type_index(request):
        "id": r.id} for r in models.RegionType.objects.all()
     ]})
 
-
-
 def on_region_index(request):
   regions = models.Region.objects
   for (query_param, key) in [
@@ -188,7 +184,7 @@ def on_region_index(request):
   title = request.GET.get("title")
   if title:
     title = stopwords.fix_district_query(title)
-    regions = edit_search(regions, "healthworker_region.title", title)
+    regions = include_similar(regions, "healthworker_region.title", title)
   regions = regions.prefetch_related("type").all()
 
   response = {
@@ -241,7 +237,7 @@ def on_facility_index(request):
   title = request.GET.get("title")
   if title:
     title = stopwords.fix_facility_query(title)
-    facilities = edit_search(facilities, "title", title)
+    facilities = include_similar(facilities, "title", title)
 
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()

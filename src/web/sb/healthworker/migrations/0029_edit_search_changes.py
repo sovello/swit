@@ -30,9 +30,6 @@ begin
     foreach haystack_token in array haystack_tokens loop
       exit when needle_found;
       needle_found = similarity(needle_token, haystack_token) >= (1-max_distance);
-      --if dmetaphone_alt(needle_token) = dmetaphone_alt(haystack_token) then
-      --  needle_found = true;
-      --end if;
     end loop;
     any_needles_not_found = any_needles_not_found or (not needle_found);
     any_needles_found = any_needles_found or needle_found;
