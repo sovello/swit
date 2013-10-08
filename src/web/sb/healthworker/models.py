@@ -527,6 +527,7 @@ class RegistrationStatus(models.Model):
   EMAIL = 25 # this state has been disabled
   SESSION2_END = 26
   END = 27 # apparently a legacy state, not really used
+  NUM_STATES = 28
 
   USSD_STATES = [
       (INTRO, u"1. Choose Language - Session 1 Intro"),
