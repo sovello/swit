@@ -11,31 +11,36 @@ create or replace function is_similar(needle text, haystack text, max_distance r
 declare
   needle_tokens text[];
   haystack_tokens text[];
+  found_tokens text[];
   haystack_token text;
   needle_token text;
   needle_found boolean;
-  any_needles_not_found boolean;
-  any_needles_found boolean;
 begin
-  haystack_tokens = regexp_split_to_array(lower(haystack), E'\\s+');
-  needle_tokens = regexp_split_to_array(lower(needle), E'\\s+');
-  any_needles_not_found = false;
-  any_needles_found = false;
+  haystack_tokens := regexp_split_to_array(lower(haystack), E'\\s+');
+  needle_tokens := regexp_split_to_array(lower(needle), E'\\s+');
   if array_length(needle_tokens, 1) = 0 and array_length(haystack_tokens, 1) = 0 then
     return true;
   end if;
+
   foreach needle_token in array needle_tokens loop
-    exit when any_needles_not_found;
-    needle_found = false;
+    needle_found := false;
     foreach haystack_token in array haystack_tokens loop
       exit when needle_found;
-      needle_found = similarity(needle_token, haystack_token) >= (1-max_distance);
+      continue when ARRAY[haystack_token] <@ found_tokens; -- don't reuse haystack tokens
+      needle_found := similarity(needle_token, haystack_token) >= (1-max_distance);
+      if needle_found then
+        found_tokens := found_tokens || haystack_token;
+      end if;
     end loop;
-    any_needles_not_found = any_needles_not_found or (not needle_found);
-    any_needles_found = any_needles_found or needle_found;
+
+    -- If any needles are not found, it's not a match
+    if not needle_found then
+      return false;
+    end if;
   end loop;
-  -- there is a match if there weren't any needles found
-  return (not any_needles_not_found) and any_needles_found;
+
+  -- There is a match as long as one needle was found
+  return array_length(found_tokens, 1) > 0;
 end;
 $$ language plpgsql;
 """
