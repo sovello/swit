@@ -91,7 +91,7 @@ class DMORegistrationAdmin(admin.ModelAdmin):
 
 class NGORegistrationAdmin(admin.ModelAdmin):
   list_display = ["ngo", "list_num", "name", "cadre", "city", "region", "district", "duty_station", "phone_number", "alt_phone_number", "check_number", "registration_number", "email"]
-  search_fields = ["ngo", "list_num", "name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
+  search_fields = ["ngo__name", "list_num", "name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
 
 class HealthWorkerAdmin(admin.ModelAdmin):
   def specialties(self, hw):
