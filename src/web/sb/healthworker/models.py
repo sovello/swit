@@ -123,7 +123,7 @@ class HealthWorker(models.Model):
     records = cls.objects
     records = records.filter(registration_number=self.mct_registration_num)
     records = records.filter(health_worker_id__isnull=True)
-    name_search = "is_similar(%%s, %s.name, 0.5)" % cls._meta.db_table
+    name_search = "is_similar(%%s, %s.name)" % cls._meta.db_table
     records = records.extra(where=[name_search], params=[self.surname])
     records = list(records[:1])
     if not records:
@@ -170,7 +170,7 @@ class HealthWorker(models.Model):
 
     records = cls.objects
     records = records.filter(health_worker_id__isnull=True)
-    name_search = "is_similar(%%s, %s.name, 0.5)" % cls._meta.db_table
+    name_search = "is_similar(%%s, %s.name)" % cls._meta.db_table
     records = records.extra(where=[name_search], params=[self.name])
     records = list(records[:1])
     if not records:

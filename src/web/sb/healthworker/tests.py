@@ -133,6 +133,18 @@ class AutoVerifyTest(TestCase):
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
 
+    # initials in source string not considered
+    with temp_obj(HealthWorker, name='J P') as hw, \
+       temp_obj(MCTRegistration, name='J P Morgan') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
+
+    # initials in dest string not considered
+    with temp_obj(HealthWorker, name='Jo Morgan') as hw, \
+       temp_obj(MCTRegistration, name='J Morgan') as mct:
+      hw.auto_verify()
+      self.assertEqual(hw.verification_state, HealthWorker.UNVERIFIED)
+
     # name close enough
     with temp_obj(HealthWorker, name='Brandon Bicford') as hw, \
        temp_obj(MCTRegistration, name='Brandon Bickford') as mct:

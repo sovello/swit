@@ -159,7 +159,7 @@ def _region_to_dictionary(region):
         "updated_at": region.updated_at}
 
 def include_similar(query_set, field, value):
-  where = ["is_similar(%%s, %s, 0.5)" % field]
+  where = ["is_similar(%%s, %s)" % field]
   where_params = [value]
   return query_set.extra(where=where, params=where_params)
 

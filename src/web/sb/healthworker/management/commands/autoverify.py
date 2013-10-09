@@ -15,12 +15,13 @@ class Command(BaseCommand):
         "Verified By Name"
       ]
 
-    for hw in HealthWorker.objects.order_by('id').all():
+    for hw in HealthWorker.objects.filter(verification_state=HealthWorker.UNVERIFIED).order_by('id').all():
       hw.auto_verify()
-      status = statuses[hw.verification_state]
-      if hw.verification_state == HealthWorker.NAME_VERIFIED:
-        status += " (matched '%s')" % hw.get_matching_name()
-      print "'%s' (id #%d): %s" % (hw.name, hw.id, status)
+      if hw.verification_state != HealthWorker.UNVERIFIED:
+        status = statuses[hw.verification_state]
+        if hw.verification_state == HealthWorker.NAME_VERIFIED:
+          status += " (matched '%s')" % hw.get_matching_name()
+        print "'%s' (id #%d): %s" % (hw.name, hw.id, status)
 
     print "Summary:"
     for i in range(len(statuses)):
