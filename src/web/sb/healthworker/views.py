@@ -158,8 +158,8 @@ def _region_to_dictionary(region):
         "created_at": region.created_at,
         "updated_at": region.updated_at}
 
-def include_similar(query_set, field, value):
-  where = ["is_similar(%%s, %s)" % field]
+def include_similar(query_set, field, value, algorithm='trigram', distance=0.5):
+  where = ["is_similar(%%s, %s, '%s', %.2f)" % (field, algorithm, distance)]
   where_params = [value]
   return query_set.extra(where=where, params=where_params)
 
@@ -184,7 +184,7 @@ def on_region_index(request):
   title = request.GET.get("title")
   if title:
     title = stopwords.fix_district_query(title)
-    regions = include_similar(regions, "healthworker_region.title", title)
+    regions = include_similar(regions, "healthworker_region.title", title, 'levenshtein', 2)
   regions = regions.prefetch_related("type").all()
 
   response = {
@@ -237,7 +237,7 @@ def on_facility_index(request):
   title = request.GET.get("title")
   if title:
     title = stopwords.fix_facility_query(title)
-    facilities = include_similar(facilities, "title", title)
+    facilities = include_similar(facilities, "title", title, 'levenshtein', 2)
 
   facilities = facilities.prefetch_related("type")
   facilities = facilities.all()
