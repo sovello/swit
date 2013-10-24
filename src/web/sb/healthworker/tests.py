@@ -6,13 +6,16 @@ Replace this with more appropriate tests for your application.
 """
 
 import contextlib
-from django.test import TestCase
+import json
+from django.test import TestCase, Client
 
 from sb.healthworker.models import HealthWorker
 from sb.healthworker.models import MCTRegistration
 from sb.healthworker.models import DMORegistration
 from sb.healthworker.models import NGORegistration
 from sb.healthworker.models import MCTPayroll
+from sb.healthworker.models import Specialty
+from sb.healthworker.models import Facility
 
 class AutoVerifyTest(TestCase):
   def test_registration_number(self):
@@ -156,6 +159,94 @@ class AutoVerifyTest(TestCase):
        temp_obj(MCTRegistration, name='Bickford Brandon Samson') as mct:
       hw.auto_verify()
       self.assertEqual(hw.verification_state, HealthWorker.NAME_VERIFIED)
+
+  def test_session1_registration(self):
+    with temp_obj(Specialty, title='Medical Officer', abbreviation='MO') as cadre:
+      c = Client()
+      self.assertEqual(len(list(HealthWorker.objects.filter(vodacom_phone="+255768763437"))), 0)
+      request_data = {
+        'name': 'Matt Olson',
+        'surname': 'Olson',
+        'specialties': [cadre.id],
+        'country': 'TZ',
+        'facility': None,
+        'vodacom_phone': '+255768763437',
+        'mct_registration_number': None,
+        'mct_payroll_number': '1234567',
+        'language': 'en'
+      }
+      response = c.post('/api/1.0/health-workers', data=json.dumps(request_data), content_type='application/json')
+      self.assertEqual(response.status_code, 200)
+      response_data = json.loads(response.content)
+      hw = HealthWorker.objects.get(id=response_data['id'])
+      self.assertEqual(hw.vodacom_phone, '+255768763437')
+
+  def test_session1_registration_autoverify(self):
+    with temp_obj(Specialty, title='Medical Officer', abbreviation='MO') as cadre,\
+         temp_obj(MCTPayroll, check_number='4567') as payroll:
+      c = Client()
+      self.assertEqual(len(list(HealthWorker.objects.filter(vodacom_phone="+255768763437"))), 0)
+      request_data = {
+        'name': 'Matt Olson',
+        'surname': 'Olson',
+        'specialties': [cadre.id],
+        'country': 'TZ',
+        'facility': None,
+        'vodacom_phone': '+255768763437',
+        'mct_registration_number': None,
+        'mct_payroll_number': '4567',
+        'language': 'en'
+      }
+      response = c.post('/api/1.0/health-workers', data=json.dumps(request_data), content_type='application/json')
+      self.assertEqual(response.status_code, 200)
+      response_data = json.loads(response.content)
+      hw = HealthWorker.objects.get(id=response_data['id'])
+      self.assertEqual(hw.vodacom_phone, '+255768763437')
+      self.assertEqual(hw.verification_state, HealthWorker.MCT_PAYROLL_VERIFIED)
+
+  def test_session2_update(self):
+    with temp_obj(Specialty, title='Medical Officer', abbreviation='MO') as cadre, \
+         temp_obj(Specialty, title='Brain Transplant Surgery') as specialty, \
+         temp_obj(Facility, title='Dar Es Salam Medical Center') as facility:
+      c = Client()
+      self.assertEqual(len(list(HealthWorker.objects.filter(vodacom_phone="+255768763437"))), 0)
+
+      # Session 1
+      request_data = {
+        'name': 'Matt Olson',
+        'surname': 'Olson',
+        'specialties': [cadre.id],
+        'country': 'TZ',
+        'facility': None,
+        'vodacom_phone': '+255768763437',
+        'mct_registration_number': None,
+        'mct_payroll_number': '1234567',
+        'language': 'en'
+      }
+      response = c.post('/api/1.0/health-workers', data=json.dumps(request_data), content_type='application/json')
+      self.assertEqual(response.status_code, 200)
+      response_data = json.loads(response.content)
+      hw = HealthWorker.objects.get(id=response_data['id'])
+      self.assertEqual(hw.vodacom_phone, '+255768763437')
+
+      # Session 2
+      request_data = {
+        'name': 'Matt Olson',
+        'surname': 'Olson',
+        'specialties': [cadre.id, specialty.id],
+        'country': 'TZ',
+        'facility': facility.id,
+        'vodacom_phone': '+255768763437',
+        'mct_registration_number': None,
+        'mct_payroll_number': '1234567',
+        'language': 'en'
+      }
+      response = c.post('/api/1.0/health-workers', data=json.dumps(request_data), content_type='application/json')
+      self.assertEqual(response.status_code, 200)
+      response_data = json.loads(response.content)
+      self.assertEqual(response_data['id'], hw.id)
+      hw = HealthWorker.objects.get(id=hw.id)
+      self.assertEqual(hw.facility_id, facility.id)
 
 @contextlib.contextmanager
 def temp_obj(django_type, **attrs):

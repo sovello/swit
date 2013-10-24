@@ -363,7 +363,15 @@ def on_health_workers_save(request):
     return http.to_json_response({"status": error["status"], "key": error.get("key")})
 
   with transaction.commit_on_success():
-    health_worker = models.HealthWorker()
+    health_worker = None
+
+    workers = list(models.HealthWorker.objects.filter(vodacom_phone=data['vodacom_phone'])[:1])
+    if workers:
+      health_worker = workers[0]
+    else:
+      health_worker = models.HealthWorker()
+      health_worker.vodacom_phone = data["vodacom_phone"]
+
     health_worker.address = data["address"]
     health_worker.birthdate = data["birthdate"]
     health_worker.name = data["name"]
@@ -374,14 +382,14 @@ def on_health_workers_save(request):
       health_worker.save()
       health_worker.specialties.add(i)
     health_worker.other_phone = data["other_phone"]
-    health_worker.vodacom_phone = data["vodacom_phone"]
     health_worker.language = data["language"]
     health_worker.mct_registration_num = data["mct_registration_number"]
     health_worker.mct_payroll_num = data["mct_payroll_number"]
     health_worker.surname = data["surname"]
+
     health_worker.save()
     health_worker.auto_verify()
-    health_worker.save()
+
     return http.to_json_response({"status": OK, "id": health_worker.id})
 
 def on_health_workers_index(request):
