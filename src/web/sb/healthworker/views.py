@@ -1,6 +1,4 @@
 # Copyright 2012 Switchboard, Inc
-
-
 import csv
 import datetime
 import json
