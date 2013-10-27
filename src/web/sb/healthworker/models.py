@@ -29,7 +29,7 @@ CUG_DEACTIVATION_SMSES = {
 }
 
 class HealthWorker(models.Model):
-  address = models.TextField(null=True, blank=True)
+  address = models.TextField("Manual Verification Notes", null=True, blank=True)
   birthdate = models.DateField(null=True, blank=True)
   country = models.CharField(max_length=2, null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
