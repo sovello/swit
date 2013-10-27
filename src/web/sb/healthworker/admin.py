@@ -1,6 +1,7 @@
 import csv
 from django.contrib import admin
 from django.http import HttpResponse
+from django.forms import ModelForm
 from sb.healthworker import models
 
 def fmt_date(x):
@@ -93,6 +94,24 @@ class NGORegistrationAdmin(admin.ModelAdmin):
   list_display = ["ngo", "list_num", "name", "cadre", "city", "region", "district", "duty_station", "phone_number", "alt_phone_number", "check_number", "registration_number", "email"]
   search_fields = ["ngo__name", "list_num", "name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
 
+
+def facilities_as_choices():
+  choices = []
+  for facility_type in models.FacilityType.objects.order_by('title').all():
+    facilities = []
+    for facility in facility_type.facility_set.all():
+      facilities.append([facility.id, facility.title])
+    choices.append([facility_type.title, facilities])
+  return choices
+
+class HealthWorkerAdminForm(ModelForm):
+  class Meta:
+    model = models.HealthWorker
+
+  def __init__(self, *args, **kwargs):
+    super(HealthWorkerAdminForm, self).__init__(*args, **kwargs)
+    self.fields['facility'].choices = facilities_as_choices()
+
 class HealthWorkerAdmin(admin.ModelAdmin):
   def specialty_names(self, hw):
     return u', '.join([s.title for s in hw.specialties.all()])
@@ -113,12 +132,16 @@ class HealthWorkerAdmin(admin.ModelAdmin):
   def created(self, hw):
     return fmt_date(hw.created_at)
 
+  form = HealthWorkerAdminForm
   list_display = ["name", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "cadre", "district", "facility", "is_closed_user_group", "created_at", "updated_at"]
+  list_filter = ['verification_state']
+  list_select_related = True
   search_fields = ["name", "vodacom_phone", "mct_registration_num", "mct_payroll_num"]
   readonly_fields = ['created_at', 'updated_at', 'added_to_closed_user_group_at', 'request_closed_user_group_at', 'is_closed_user_group', 'language']
   fields = ["name", "surname", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "address", "facility", "specialties"] + readonly_fields
   csv_fields = ["id", "name", "specialty_names", "cadre", "district", "facility", "facility_type", "address", "vodacom_phone", "is_closed_user_group", "mct_registration_num", "mct_payroll_num", "verification_state", "created"]
   actions = [export_as_csv_action(fields=csv_fields)]
+  filter_horizontal = ['specialties']
   date_hierarchy = 'created_at'
 
 class RegistrationStatusAdmin(admin.ModelAdmin):

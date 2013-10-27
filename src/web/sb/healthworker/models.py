@@ -301,6 +301,9 @@ class Facility(models.Model):
 
   Like "Dar Es Salam Medical Center"
   """
+  class Meta:
+    ordering = ['title']
+
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   region = models.ForeignKey(Region, null=True, blank=True, db_index=True)
   address = models.TextField(blank=True, null=True)
