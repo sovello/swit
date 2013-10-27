@@ -120,8 +120,14 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'sb.healthworker',
+    'ajax_select',
     'gunicorn',
     'south')
+
+# define the lookup channels for ajax_select
+AJAX_LOOKUP_CHANNELS = {
+  'facility' : {'model': 'healthworker.Facility', 'search_field': 'title'}
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

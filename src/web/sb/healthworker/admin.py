@@ -1,7 +1,8 @@
 import csv
+from ajax_select import make_ajax_form
+from ajax_select.admin import AjaxSelectAdmin
 from django.contrib import admin
 from django.http import HttpResponse
-from django.forms import ModelForm
 from sb.healthworker import models
 
 def fmt_date(x):
@@ -94,25 +95,7 @@ class NGORegistrationAdmin(admin.ModelAdmin):
   list_display = ["ngo", "list_num", "name", "cadre", "city", "region", "district", "duty_station", "phone_number", "alt_phone_number", "check_number", "registration_number", "email"]
   search_fields = ["ngo__name", "list_num", "name", "phone_number", "registration_number", "check_number", "cadre", "city", "district", "region"]
 
-
-def facilities_as_choices():
-  choices = []
-  for facility_type in models.FacilityType.objects.order_by('title').all():
-    facilities = []
-    for facility in facility_type.facility_set.all():
-      facilities.append([facility.id, facility.title])
-    choices.append([facility_type.title, facilities])
-  return choices
-
-class HealthWorkerAdminForm(ModelForm):
-  class Meta:
-    model = models.HealthWorker
-
-  def __init__(self, *args, **kwargs):
-    super(HealthWorkerAdminForm, self).__init__(*args, **kwargs)
-    self.fields['facility'].choices = facilities_as_choices()
-
-class HealthWorkerAdmin(admin.ModelAdmin):
+class HealthWorkerAdmin(AjaxSelectAdmin):
   def specialty_names(self, hw):
     return u', '.join([s.title for s in hw.specialties.all()])
 
@@ -132,8 +115,8 @@ class HealthWorkerAdmin(admin.ModelAdmin):
   def created(self, hw):
     return fmt_date(hw.created_at)
 
-  form = HealthWorkerAdminForm
-  list_display = ["name", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "cadre", "district", "facility", "is_closed_user_group", "created_at", "updated_at"]
+  form = make_ajax_form(models.HealthWorker, {'facility': 'facility'})
+  list_display = ["name", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "cadre", "facility", "is_closed_user_group", "created_at"]
   list_filter = ['verification_state']
   list_select_related = True
   search_fields = ["name", "vodacom_phone", "mct_registration_num", "mct_payroll_num"]

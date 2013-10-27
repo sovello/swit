@@ -45,7 +45,7 @@ class HealthWorker(models.Model):
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
-  is_closed_user_group = models.BooleanField(default=False, blank=True)
+  is_closed_user_group = models.BooleanField("In CUG", default=False, blank=True)
   added_to_closed_user_group_at = models.DateTimeField(null=True, default=None, blank=True)
   request_closed_user_group_at = models.DateTimeField(null=True, default=None, blank=True)
 
@@ -329,7 +329,7 @@ class Facility(models.Model):
   current_id = models.CharField(max_length=255, null=True, blank=True)
 
   def __unicode__(self):
-    return self.title
+    return "%s (%s in %s)" % (self.title, self.type.title, self.region.title)
 
 class Specialty(models.Model):
   """A health worker specialty
