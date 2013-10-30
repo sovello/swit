@@ -1,14 +1,16 @@
 # Django settings for sb project.
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+  ('Matt Olson', 'molson@rubycloud.com'),
 )
 
 MANAGERS = ADMINS
+
+ALLOWED_HOSTS = ['api.switchboard.org']
 
 DATABASES = {
     'default': {
