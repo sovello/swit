@@ -1,4 +1,5 @@
 import csv
+import datetime
 from ajax_select import make_ajax_form
 from ajax_select.admin import AjaxSelectAdmin
 from django.contrib import admin
@@ -14,35 +15,30 @@ def fmt_date(x):
     return u''
 
 # http://djangosnippets.org/snippets/2369/
-def export_as_csv_action(description="CSV Export", fields=None, exclude=None, header=True):
+def export_as_csv_action(description="CSV Export", fields=[], header=True):
   """
   This function returns an export csv action
-  'fields' and 'exclude' work like in django ModelForm
+  'fields' is the list of model columns and/or modeladmin methods to use
   'header' is whether or not to output the column names as the first row
   """
-  def export_as_csv(modeladmin, request, queryset):
+  def export_as_csv(modeladmin, request, queryset, fields=fields, header=header):
     """
     Generic csv export admin action.
     """
     opts = modeladmin.model._meta
-    field_names = set([field.name for field in opts.fields])
-    if fields:
-      fieldset = set(fields)
-      field_names = field_names & fieldset
-    elif exclude:
-      excludeset = set(exclude)
-      field_names = field_names - excludeset
+    if len(fields) == 0:
+      fields = [field.name for field in opts.fields]
 
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s.csv' % unicode(opts).replace('.', '_')
     writer = csv.writer(response)
 
     if header:
-      writer.writerow(list(field_names))
+      writer.writerow(fields)
 
     for obj in queryset:
       row = []
-      for field in field_names:
+      for field in fields:
         value = getattr(obj, field) if hasattr(obj, field) else getattr(modeladmin, field)(obj)
         row.append(unicode(value).encode('utf-8'))
       writer.writerow(row)
@@ -99,6 +95,9 @@ class HealthWorkerAdmin(AjaxSelectAdmin):
   def specialty_names(self, hw):
     return u', '.join([s.title for s in hw.specialties.all()])
 
+  def facility_name(self, hw):
+    return hw.facility.title if hw.facility else u''
+
   def facility_type(self, hw):
     return hw.facility.type.title if hw.facility else u''
 
@@ -115,14 +114,17 @@ class HealthWorkerAdmin(AjaxSelectAdmin):
   def created(self, hw):
     return fmt_date(hw.created_at)
 
+  def verification_display_name(self, hw):
+    return hw._meta.get_field('verification_state').choices[hw.verification_state][1]
+
   form = make_ajax_form(models.HealthWorker, {'facility': 'facility'})
-  list_display = ["name", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "cadre", "facility", "is_closed_user_group", "created_at"]
+  list_display = ["name", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "cadre", "facility_name", "facility_type", "district", "is_closed_user_group", "created_at"]
   list_filter = ['verification_state']
   list_select_related = True
   search_fields = ["name", "vodacom_phone", "mct_registration_num", "mct_payroll_num"]
   readonly_fields = ['created_at', 'updated_at', 'added_to_closed_user_group_at', 'request_closed_user_group_at', 'is_closed_user_group', 'language']
   fields = ["name", "surname", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "address", "facility", "specialties"] + readonly_fields
-  csv_fields = ["id", "name", "specialty_names", "cadre", "district", "facility", "facility_type", "address", "vodacom_phone", "is_closed_user_group", "mct_registration_num", "mct_payroll_num", "verification_state", "created"]
+  csv_fields = ["id", "name", "specialty_names", "cadre", "district", "facility_name", "facility_type", "address", "vodacom_phone", "is_closed_user_group", "mct_registration_num", "mct_payroll_num", "verification_display_name", "created"]
   actions = [export_as_csv_action(fields=csv_fields)]
   filter_horizontal = ['specialties']
   date_hierarchy = 'created_at'
