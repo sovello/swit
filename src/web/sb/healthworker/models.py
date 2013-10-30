@@ -329,7 +329,9 @@ class Facility(models.Model):
   current_id = models.CharField(max_length=255, null=True, blank=True)
 
   def __unicode__(self):
-    return "%s (%s in %s)" % (self.title, self.type.title, self.region.title)
+    return "%s (%s in %s)" % (self.title,
+                              self.type.title if self.type else '?',
+                              self.region.title if self.region else '?')
 
 class Specialty(models.Model):
   """A health worker specialty
