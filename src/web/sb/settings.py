@@ -124,7 +124,8 @@ INSTALLED_APPS = (
     'sb.healthworker',
     'ajax_select',
     'gunicorn',
-    'south')
+    'south' # not needed for django version 1.9
+)
 
 # define the lookup channels for ajax_select
 AJAX_LOOKUP_CHANNELS = {
