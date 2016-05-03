@@ -41,7 +41,7 @@ class HealthWorker(models.Model):
   surname = models.CharField(null=True, max_length=128, blank=True)
   other_phone = models.CharField(max_length=255, null=True, blank=True)
   specialties = models.ManyToManyField("Specialty", blank=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
   vodacom_phone = models.CharField(null=True, max_length=128, blank=True)
   mct_registration_num = models.CharField(null=True, max_length=128, blank=True)
   mct_payroll_num = models.CharField(null=True, max_length=128, blank=True)
@@ -238,7 +238,7 @@ class RegionType(models.Model):
   """The type of a region like "Village" """
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
   COUNTRY = "Country"
   VILLAGE = "Village"
@@ -256,7 +256,7 @@ class Region(models.Model):
   type = models.ForeignKey(RegionType, null=True, blank=True, db_index=True)
   parent_region = models.ForeignKey("Region", null=True, blank=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
   def __unicode__(self):
     return self.title
@@ -290,7 +290,7 @@ class FacilityType(models.Model):
   "A facility type like Hospital"
   title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
   priority = models.IntegerField(null=False, default=0, blank=True)
 
   def __unicode__(self):
@@ -314,7 +314,7 @@ class Facility(models.Model):
   phone = models.CharField(max_length=255, blank=True, null=True)
   place_type = models.CharField(max_length=64, blank=True, null=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
   type = models.ForeignKey(FacilityType, null=True, blank=False, db_index=True)
   msisdn = models.CharField(max_length=255, blank=True, null=True)
   is_user_submitted = models.NullBooleanField()
@@ -343,7 +343,7 @@ class Specialty(models.Model):
   title = models.CharField(max_length=255, blank=False, null=False, db_index=True)
   abbreviation = models.CharField(max_length=32, blank=True, null=True, db_index=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
   parent_specialty = models.ForeignKey("Specialty", blank=True, null=True, db_index=True)
   is_user_submitted = models.NullBooleanField()
   is_query_subspecialties = models.BooleanField(default=False, blank=True)
@@ -433,7 +433,7 @@ class MCTRegistration(models.Model):
   specialties = models.ManyToManyField("Specialty")
   specialty = models.CharField(max_length=255, null=True, blank=True)
   specialty_duration = models.CharField(max_length=255, null=True, blank=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
   def __unicode__(self):
     return self.name
@@ -447,7 +447,7 @@ class DMORegistration(models.Model):
   registration_number = models.CharField(max_length=255, null=True, blank=True)
   check_number = models.CharField(max_length=255, null=True, blank=True)
   health_worker = models.ForeignKey(HealthWorker, null=True, blank=True, db_index=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
   # Not really used, but import it anyway, might want it at some point
   cadre = models.CharField(max_length=255, null=True, blank=True)
@@ -498,7 +498,7 @@ class NGORegistration(models.Model):
   check_number = models.CharField(max_length=255, null=True, blank=True)
   registration_number = models.CharField(max_length=255, null=True, blank=True)
   email = models.EmailField(null=True, blank=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
   def __unicode__(self):
     return self.name
@@ -572,7 +572,7 @@ class RegistrationStatus(models.Model):
   num_possible_timeouts = models.IntegerField(null=True, blank=True)
   registered = models.BooleanField(default=False)
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
 # The individual answers to each question
 class RegistrationAnswer(models.Model):
@@ -581,10 +581,10 @@ class RegistrationAnswer(models.Model):
   answer = models.CharField(max_length=255, blank=True)
   page = models.IntegerField(null=True, blank=True) # some questions are multi-page, this is the last page they saw
   created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
 
 class DataSet(models.Model):
   key = models.CharField(null=False, blank=False, max_length=128)
-  updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+  updated_at = models.DateTimeField(auto_now_add=True)
   created_at = models.DateTimeField(auto_now_add=True)
 
