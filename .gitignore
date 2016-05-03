@@ -1,4 +1,9 @@
 *.pyc
 *.sw?
 doc/time.txt
-
+bin/
+include/
+lib/
+local/
+pip-selfcheck.json
+src/web/sb/dev_settings.py
