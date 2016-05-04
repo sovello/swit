@@ -99,14 +99,14 @@ class HealthWorkerAdmin(AjaxSelectAdmin):
     return hw.facility.title if hw.facility else u''
 
   def facility_type(self, hw):
-    return hw.facility.type.title if hw.facility else u''
+    return hw.facility.title if hw.facility else u''
 
   def cadre(self, hw):
     specialties = hw.specialties.filter(parent_specialty__isnull=True)
     return specialties.all()[0].abbreviation if specialties.count() > 0 else u''
 
   def district(self, hw):
-    return hw.facility.region.title if hw.facility else u''
+    return hw.facility.title if hw.facility else u''
 
   def birthday(self, hw):
     return fmt_date(hw.birthdate)
