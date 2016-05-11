@@ -7,3 +7,4 @@ lib/
 local/
 pip-selfcheck.json
 src/web/sb/dev_settings.py
+src/web/app.log
