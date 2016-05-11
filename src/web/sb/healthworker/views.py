@@ -10,9 +10,10 @@ import types
 import StringIO
 
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.db import transaction
+from django.shortcuts import render
 
 from sb import http
 from sb.healthworker import models
@@ -532,14 +533,10 @@ def cug(request):
           phone = entry["phone"]
           phone = normalize_tz_phone(phone)
           if phone:
-            phone_numbers.append(phone)
-      with transaction.commit_on_success():
-        hws = models.HealthWorker.objects.filter(vodacom_phone__in=phone_numbers)
-        for hw in hws:
-          hw.set_closed_user_group(True)
+            phone_numbers.append(phone)      
+      hws = models.HealthWorker.objects.filter(vodacom_phone__in=phone_numbers)
+      for hw in hws:
+        hw.set_closed_user_group(True)
   else:
     form = UploadForm()
-  return sb.html.render_response(request,
-                                 "sb.healthworker",
-                                 "cug.html",
-                                 form=form)
+  return render(request, "cug.html", {'form':form})
