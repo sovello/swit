@@ -4,18 +4,19 @@
 </style>
 <body>
 <h1>CUG Upload</h1>
-  % if request.method == "POST" and form.is_valid():
+ {% if request.method == "POST" and form.is_valid %}
   <h2>Submitted.  Thanks!</h2>
-  % else:
+  {% else %}
   <form method="post" action="/cug" enctype="multipart/form-data">
+{% csrf_token %}
     <fieldset>
       <table>
-        ${form.as_table()}
+        {{ form.as_table }}
         <tr><td></td><td><input type="submit" value="Send" /></td></tr>
       </table>
     </fieldset>
   </form>
-  % endif
+  {% endif %}
 </body>
 </html>
 
