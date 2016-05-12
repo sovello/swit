@@ -119,7 +119,7 @@ class HealthWorkerAdmin(AjaxSelectAdmin):
 
   form = make_ajax_form(models.HealthWorker, {'facility': 'facility'})
   list_display = ["name", "vodacom_phone", "verification_state", "mct_registration_num", "mct_payroll_num", "cadre", "facility_name", "facility_type", "district", "is_closed_user_group", "created_at"]
-  list_filter = ['verification_state']
+  list_filter = ['verification_state', 'is_closed_user_group']
   list_select_related = True
   search_fields = ["name", "vodacom_phone", "mct_registration_num", "mct_payroll_num"]
   readonly_fields = ['created_at', 'updated_at', 'added_to_closed_user_group_at', 'request_closed_user_group_at', 'is_closed_user_group', 'language']
