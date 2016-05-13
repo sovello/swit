@@ -438,6 +438,7 @@ def on_facility_type_index(request):
   response = {"status": OK, "facility_types": facility_types}
   return http.to_json_response(response)
 
+@csrf_exempt
 def on_specialty(request):
   if request.method != "POST":
     return on_specialty_index(request)
@@ -471,6 +472,7 @@ def parse_specialty_input(data):
     "parent_specialty": foreign_key_parser(models.Specialty, required=False)})
   return parser(data)
 
+@csrf_exempt
 def on_facility(request):
   if request.method != "POST":
     return on_facility_index(request)
