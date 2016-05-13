@@ -14,6 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.db import transaction
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from sb import http
 from sb.healthworker import models
@@ -361,7 +362,7 @@ def on_health_workers_save(request):
   if error:
     return http.to_json_response({"status": error["status"], "key": error.get("key")})
 
-  with transaction.commit_on_success():
+  with transaction.atomic():
     health_worker = None
 
     workers = list(models.HealthWorker.objects.filter(vodacom_phone=data['vodacom_phone'])[:1])
@@ -417,6 +418,7 @@ def on_health_workers_index(request):
         "facility": i.facility_id}
        for i in health_workers if i.verification_state]})
 
+@csrf_exempt
 @_log_request_json
 def on_health_worker(request):
   if request.method == "POST":
@@ -451,7 +453,7 @@ def on_specialty_create(request):
   if error:
     return http.to_json_response({"status": error["status"], "key": error.get("key")})
 
-  with transaction.commit_on_success():
+  with transaction.atomic():
     if list(models.Specialty.objects.filter(title=data["title"], parent_specialty=data["parent_specialty"]).all()):
       return http.to_json_response({"status": ERROR_INVALID_INPUT})
     specialty = models.Specialty()
@@ -492,7 +494,7 @@ def on_facility_create(request):
   data, error = parse_facility_input(request.JSON)
   if error:
     return http.to_json_response({"status": error["status"], "key": error.get("key")})
-  with transaction.commit_on_success():
+  with transaction.atomic():
     facility = models.Facility()
     facility.title = data["title"]
     facility.address = data["address"]
