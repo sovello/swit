@@ -50,5 +50,5 @@ class Command(BaseCommand):
                          [ options['dst_email'] ],
                          cc=options['cc_email'] if options['cc_email'] else None)
     filename = now.strftime("cug-request-%Y%m%d-%H%M%S.xls")    
-    email.attach(filename, dataset.xlsx, "application/vnd.ms-excel")
+    email.attach(filename, dataset.xls, "application/vnd.ms-excel")
     email.send()
