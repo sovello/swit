@@ -8,6 +8,8 @@ import sys
 import time
 import types
 import StringIO
+import requests
+from xml.etree import ElementTree as ET
 
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
@@ -15,6 +17,7 @@ from django import forms
 from django.db import transaction
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from sb import http
 from sb.healthworker import models
@@ -28,6 +31,10 @@ OK = 0
 ERROR_INVALID_INPUT = -1
 ERROR_INVALID_PATTERN = -2
 
+BASE_URL = 'http://localhost:8984/CSD/csr/'
+BASE_URL_SUFFIX = '/careServicesRequest/'
+
+
 def _log_request_json(function):
   def new_function(request):
     json = getattr(request, 'JSON', None)
@@ -36,6 +43,16 @@ def _log_request_json(function):
     response = function(request)
     return response
   return new_function
+
+def csd_query(query_file, csd_document, csd_function):
+    full_url = BASE_URL + csd_document + BASE_URL_SUFFIX + csd_function
+    request_file = query_file    
+    file_set = {'file': (request_file, open(request_file, 'rb'), 'text/xml', {'Expires': '0'})}
+    r = requests.post(full_url, files=file_set)
+    if r.status_code == 200:
+      return r.content
+    else:
+      return False
 
 def _specialty_to_dictionary(specialty):
   "Convert a Specialty to a dictionary suitable for JSON encoding"
@@ -217,7 +234,24 @@ def _facility_to_dictionary(facility):
       "updated_at": facility.updated_at}
 
 def on_facility_index(request):
-  facilities = models.Facility.objects
+  csd_document = 'CSD-Facilities-Connectathon-20131227'
+  csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
+  #query_file = static('csd_read_queries/query_facility.xml') 
+  query_file = ('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/query_facility.xml') 
+  return_text = csd_query(query_file, csd_document, csd_function)
+  if return_text == False:
+    response = {
+      "status": "FAILED"
+      }
+  else:
+    return_text = ET.fromstring(return_text)
+    return_text = 
+    response = {
+      "status": OK,
+      "facilities": return_text}
+  return http.to_json_response(response)
+
+  '''facilities = models.Facility.objects
   region_id = request.GET.get("region")
   if region_id:
     # compute subregions here.
@@ -248,6 +282,7 @@ def on_facility_index(request):
       "status": OK,
       "facilities": map(_facility_to_dictionary, facilities)}
   return http.to_json_response(response)
+'''
 
 _address_pat = re.compile(u"^.{1,255}$")
 _email_pat = re.compile(u"^.+@.+$")
