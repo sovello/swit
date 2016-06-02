@@ -256,8 +256,7 @@ def returnRegion(districtID, csd_document='CSD-District-List'):
     return 'None'
   else:
     csd_document = csd_document
-    csd_function = 'urn:ihe:iti:csd:2014:stored-function:organization-search'
-    #write_file = open('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/csd_query.xml', 'r+')
+    csd_function = 'urn:ihe:iti:csd:2014:stored-function:organization-search'    
     write_file = os.system("touch /tmp/csd_query.xml")
     write_file = open('/tmp/csd_query.xml', 'r+')
     requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")
@@ -265,7 +264,6 @@ def returnRegion(districtID, csd_document='CSD-District-List'):
     region_id.text = districtID
     string = ET.tostring(requestParams)
     write_file.write(string.replace("xmlns", "xmlns:csd"))
-    #query_file = ('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/csd_query.xml')
     query_file = ('/tmp/csd_query.xml')
     return_text = csd_query(query_file, csd_document, csd_function)
     
@@ -282,8 +280,12 @@ def returnRegion(districtID, csd_document='CSD-District-List'):
 def on_facility_index(request):
   csd_document = 'CSD-Facility-List'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
-  #query_file = static('csd_read_queries/query_facility.xml') 
-  query_file = ('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/query_facility.xml') 
+  write_file = os.system("touch /tmp/csd_query_facility.xml")
+  write_file = open('/tmp/csd_query_facility.xml', 'r+')
+  requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")  
+  string = ET.tostring(requestParams)
+  write_file.write(string.replace("xmlns", "xmlns:csd"))
+  query_file = ('/tmp/csd_query_facility.xml')    
   return_text = csd_query(query_file, csd_document, csd_function)
   if return_text == False:
     response = {
