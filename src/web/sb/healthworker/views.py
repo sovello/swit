@@ -283,6 +283,8 @@ def on_facility_index(request):
   write_file = os.system("touch /tmp/csd_query_facility.xml")
   write_file = open('/tmp/csd_query_facility.xml', 'r+')
   requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")  
+  region_id = ET.SubElement(requestParams, 'csd:id', entityID="")
+  region_id.text = ""
   string = ET.tostring(requestParams)
   write_file.write(string.replace("xmlns", "xmlns:csd"))
   query_file = ('/tmp/csd_query_facility.xml')    
