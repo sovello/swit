@@ -5,6 +5,7 @@ import json
 import logging
 import re
 import sys
+import os
 import time
 import types
 import StringIO
@@ -233,8 +234,53 @@ def _facility_to_dictionary(facility):
       "created_at": facility.created_at,
       "updated_at": facility.updated_at}
 
+def retDistrictID(ETObject, with_name=False):
+  district = ETObject.find('{urn:ihe:iti:csd:2013}organizations/{urn:ihe:iti:csd:2013}organization')
+  if district == None:
+    return 'None'
+  else:
+    if with_name:
+      return {'id':district.get('entityID'), 'name':district.find('{urn:ihe:iti:csd:2013}primaryName').text}
+    else:
+      return district.get('entityID')
+
+blank = '''<CSD xmlns="urn:ihe:iti:csd:2013" xmlns:csd="urn:ihe:iti:csd:2013">
+  <organizationDirectory/>
+  <serviceDirectory/>
+  <facilityDirectory/>
+  <providerDirectory/>
+</CSD>'''
+
+def returnRegion(districtID, csd_document='iHRIS-District-List'):
+  if districtID == 'None':
+    return 'None'
+  else:
+    csd_document = csd_document
+    csd_function = 'urn:ihe:iti:csd:2014:stored-function:organization-search'
+    #write_file = open('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/csd_query.xml', 'r+')
+    write_file = os.system("touch /tmp/csd_query.xml")
+    write_file = open('/tmp/csd_query.xml', 'r+')
+    requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")
+    region_id = ET.SubElement(requestParams, 'csd:id', entityID=districtID)
+    region_id.text = districtID
+    string = ET.tostring(requestParams)
+    write_file.write(string.replace("xmlns", "xmlns:csd"))
+    #query_file = ('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/csd_query.xml')
+    query_file = ('/tmp/csd_query.xml')
+    return_text = csd_query(query_file, csd_document, csd_function)
+    
+    if return_text == False:
+      return None
+    else:
+      if len(return_text) == len(blank):
+        return returnRegion(districtID, 'iHRIS-County-List')
+      else:        
+        return_text = ET.fromstring(return_text)
+        region = return_text.find('{urn:ihe:iti:csd:2013}organizationDirectory/{urn:ihe:iti:csd:2013}organization')          
+        return {'id':region.get('entityID'), 'title':region.find('{urn:ihe:iti:csd:2013}primaryName').text}
+
 def on_facility_index(request):
-  csd_document = 'CSD-Facilities-Connectathon-20131227'
+  csd_document = 'iHRIS-Facilities-List'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
   #query_file = static('csd_read_queries/query_facility.xml') 
   query_file = ('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/query_facility.xml') 
@@ -245,44 +291,18 @@ def on_facility_index(request):
       }
   else:
     return_text = ET.fromstring(return_text)
-    return_text = 
+    facs = [{'region_id':retDistrictID(facility), 'id':facility.get('entityID'), 'title':facility.find('{urn:ihe:iti:csd:2013}primaryName').text} for facility in return_text.iter('{urn:ihe:iti:csd:2013}facility')]
+    fetch = []    
+    for fac in facs:
+      print(fac['region_id'])
+      reg =  returnRegion(fac['region_id'], 'iHRIS-District-List')
+      fac['region'] = reg
+      print(fac)
+      fetch.append(fac)
     response = {
       "status": OK,
-      "facilities": return_text}
+      "facilities": fetch}
   return http.to_json_response(response)
-
-  '''facilities = models.Facility.objects
-  region_id = request.GET.get("region")
-  if region_id:
-    # compute subregions here.
-    region_ids = set()
-    try:
-      region = models.Region.objects.get(id=region_id)
-    except models.Region.DoesNotExist:
-      pass
-    else:
-      region_ids.add(region.id)
-      region_ids.update(region.subregion_ids())
-    facilities = facilities.filter(region_id__in=region_ids)
-  facility_type = sb.util.safe(lambda:int(request.GET["type"]))
-  if facility_type:
-    facilities = facilities.filter(type_id=facility_type)
-
-  title = request.GET.get("title")
-  if title:
-    title = stopwords.fix_facility_query(title)
-    facilities = include_similar(facilities, "title", title, 'levenshtein', 2)
-
-  facilities = facilities.prefetch_related("type")
-  facilities = facilities.all()
-  facilities = filter(lambda f: not f.is_user_submitted, facilities)
-  facilities = list(facilities)
-  facilities.sort(key=lambda i:(sys.maxint - i.type.priority, i.title))
-  response = {
-      "status": OK,
-      "facilities": map(_facility_to_dictionary, facilities)}
-  return http.to_json_response(response)
-'''
 
 _address_pat = re.compile(u"^.{1,255}$")
 _email_pat = re.compile(u"^.+@.+$")
@@ -429,29 +449,27 @@ def on_health_workers_save(request):
 
 def on_health_workers_index(request):
   """Get an index of health care workers"""
-  health_workers = models.HealthWorker.objects.all()
-  health_workers = health_workers.prefetch_related("specialties", "facility").all()
-
-  return http.to_json_response(
-    {"status": OK,
-     "health_workers": [
-       {"id": i.id,
-        "name": i.name,
-        "country": i.country,
-        "vodacom_phone": i.vodacom_phone,
-        "created_at": i.created_at,
-        "updated_at": i.updated_at,
-        "language": i.language,
-        "mct_registration_num": i.mct_registration_num,
-        "mct_payroll_num": i.mct_payroll_num,
-        "verification_state": i.verification_state,
-        "email": i.email,
-        "birthdate": i.birthdate,
-        "address": i.address,
-        "other_phone": i.other_phone,
-        "specialties": [s.id for s in i.specialties.all()],
-        "facility": i.facility_id}
-       for i in health_workers if i.verification_state]})
+  csd_document = 'iHRIS-Providers-List'
+  csd_function = 'urn:ihe:iti:csd:2014:stored-function:provider-search'
+  os.system("touch /tmp/provider.xml")
+  write_file = open('/tmp/provider.xml', 'r+')
+  requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")
+  string = ET.tostring(requestParams)
+  write_file.write(string.replace("xmlns", "xmlns:csd"))  
+  query_file = ("/tmp/provider.xml")
+  return_text = csd_query(query_file, csd_document, csd_function)
+  if return_text == False:
+    response = {
+      "status":0
+      }
+  else:
+    return_text = ET.fromstring(return_text)
+    health_workers = [{"name":hworker.find("{urn:ihe:iti:csd:2013}demographic/{urn:ihe:iti:csd:2013}name/{urn:ihe:iti:csd:2013}commonName").text, "id":hworker.get("entityID"), "country":"TZ"} for hworker in return_text.iter('{urn:ihe:iti:csd:2013}provider')]
+    response = {
+      "status": 0,
+      "health_workers":health_workers
+      }
+  return http.to_json_response(response)
 
 @csrf_exempt
 @_log_request_json
