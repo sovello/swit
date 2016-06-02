@@ -280,7 +280,7 @@ def returnRegion(districtID, csd_document='CSD-District-List'):
         return {'id':region.get('entityID'), 'title':region.find('{urn:ihe:iti:csd:2013}primaryName').text}
 
 def on_facility_index(request):
-  csd_document = 'iHRIS-Facilities-List'
+  csd_document = 'CSD-Facility-List'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
   #query_file = static('csd_read_queries/query_facility.xml') 
   query_file = ('/home/fugit/fugitspace/switchboard/switchboard-hwr/src/web/static/csd_read_queries/query_facility.xml') 
