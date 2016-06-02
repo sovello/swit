@@ -251,7 +251,7 @@ blank = '''<CSD xmlns="urn:ihe:iti:csd:2013" xmlns:csd="urn:ihe:iti:csd:2013">
   <providerDirectory/>
 </CSD>'''
 
-def returnRegion(districtID, csd_document='iHRIS-District-List'):
+def returnRegion(districtID, csd_document='CSD-District-List'):
   if districtID == 'None':
     return 'None'
   else:
@@ -273,7 +273,7 @@ def returnRegion(districtID, csd_document='iHRIS-District-List'):
       return None
     else:
       if len(return_text) == len(blank):
-        return returnRegion(districtID, 'iHRIS-County-List')
+        return returnRegion(districtID, 'CSD-County-List')
       else:        
         return_text = ET.fromstring(return_text)
         region = return_text.find('{urn:ihe:iti:csd:2013}organizationDirectory/{urn:ihe:iti:csd:2013}organization')          
@@ -295,7 +295,7 @@ def on_facility_index(request):
     fetch = []    
     for fac in facs:
       print(fac['region_id'])
-      reg =  returnRegion(fac['region_id'], 'iHRIS-District-List')
+      reg =  returnRegion(fac['region_id'], 'CSD-District-List')
       fac['region'] = reg
       print(fac)
       fetch.append(fac)
@@ -449,7 +449,7 @@ def on_health_workers_save(request):
 
 def on_health_workers_index(request):
   """Get an index of health care workers"""
-  csd_document = 'iHRIS-Providers-List'
+  csd_document = 'CSD-Provider-List'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:provider-search'
   os.system("touch /tmp/provider.xml")
   write_file = open('/tmp/provider.xml', 'r+')
