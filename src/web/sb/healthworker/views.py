@@ -32,7 +32,7 @@ OK = 0
 ERROR_INVALID_INPUT = -1
 ERROR_INVALID_PATTERN = -2
 
-BASE_URL = 'http://localhost:8984/CSD/csr/'
+BASE_URL = 'http://46.51.196.92:8984/CSD/csr/'
 BASE_URL_SUFFIX = '/careServicesRequest/'
 
 
@@ -47,7 +47,7 @@ def _log_request_json(function):
 
 def csd_query(query_file, csd_document, csd_function):
     full_url = BASE_URL + csd_document + BASE_URL_SUFFIX + csd_function
-    request_file = query_file    
+    request_file = query_file
     file_set = {'file': (request_file, open(request_file, 'rb'), 'text/xml', {'Expires': '0'})}
     r = requests.post(full_url, files=file_set)
     if r.status_code == 200:
@@ -70,15 +70,33 @@ def _specialty_to_dictionary(specialty):
           "title": specialty.title}
 
 def on_specialty_index(request):
-  """Get a list of specialties"""
-  specialties = models.Specialty.objects.all()
-
-  # Filter out user submitted specialties:
-  specialties = [i for i in specialties if not i.is_user_submitted]
-  specialties.sort(key=lambda i: ((sys.maxint - i.priority), i.title))
-  return http.to_json_response({
-    "status": OK,
-    "specialties": map(_specialty_to_dictionary, specialties)})
+  """Get a list of specialties"""    
+  write_file = os.system("touch /tmp/csd_query_facility.xml")
+  write_file = open('/tmp/csd_query_facility.xml', 'r+')
+  requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")  
+  region_id = ET.SubElement(requestParams, 'csd:id', entityID="")
+  region_id.text = ""
+  string = ET.tostring(requestParams)
+  write_file.write(string.replace("xmlns", "xmlns:csd"))
+  
+  query_file = ('/tmp/csd_query_facility.xml')    
+  csd_document = 'CSD-HNP'
+  csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
+  request_file = query_file
+  full_url = BASE_URL + csd_document + BASE_URL_SUFFIX + csd_function
+  file_set = {'file': (request_file, open(request_file, 'rb'), 'text/xml', {'Expires': '0'})}
+  r = requests.post(full_url, files=file_set)
+  if r.status_code == 200:
+    return_text = ET.fromstring(r.content)
+    specialties = [{'id':specialty.get('entityID'), 'title':specialty.find('{urn:ihe:iti:csd:2013}primaryName').text} for specialty in return_text.iter('{urn:ihe:iti:csd:2013}organization')]
+    response = {
+      "status": OK,
+      "specialties": specialties}
+  else:
+    response = {
+      "status": "FAILED"
+    }
+  return http.to_json_response(response)
 
 def on_mct_payroll_index(request):
   """Get a list of ministry of tanzania payroll entries"""
@@ -191,23 +209,43 @@ def on_region_type_index(request):
        "id": r.id} for r in models.RegionType.objects.all()
     ]})
 
+region_types = {
+  "1": "Country",
+  "2": "Region",
+  "3": "District",
+  "4": "Division",
+  "5": "Village",
+  "6": "Ward",
+}
 def on_region_index(request):
-  regions = models.Region.objects
-  for (query_param, key) in [
-      ("parent_region_id", "parent_region_id"),
-      ("type", "type__title__iexact")]:
-    val = request.GET.get(query_param)
-    if val:
-      regions = regions.filter(**{key: val})
-  title = request.GET.get("title")
-  if title:
-    title = stopwords.fix_district_query(title)
-    regions = include_similar(regions, "healthworker_region.title", title, 'levenshtein', 2)
-  regions = regions.prefetch_related("type").all()
-
-  response = {
+  csd_document = 'CSD-HNP'
+  csd_function = 'urn:ihe:iti:csd:2014:stored-function:organization-search'
+  write_file = os.system("rm /tmp/csd_query_region.xml; touch /tmp/csd_query_region.xml")
+  write_file = open('/tmp/csd_query_region.xml', 'r+')  
+  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:organization><csd:codedType code="1" codingScheme="2.25.220237170085002235066132143088055219024007198012" /></csd:organization></csd:requestParams>'
+  
+  #region_filters = code="2" codingScheme="2.25.220237170085002235066132143088055219024007198012"
+  #district_filters code="3" codingScheme="2.25.220237170085002235066132143088055219024007198012"
+  #region_id.text = ""
+  write_file.write(query_string)
+  write_file.close()
+  query_file = ('/tmp/csd_query_region.xml')    
+  return_text = csd_query(query_file, csd_document, csd_function)
+  if return_text == False:
+    response = {
+      "status": "FAILED"
+      }
+  else:
+    return_text = ET.fromstring(return_text)
+    regions = [{'parent_region_id':region.find('{urn:ihe:iti:csd:2013}parent').get('entityID'),
+                'title':region.find('{urn:ihe:iti:csd:2013}primaryName').text,                
+                'created_at':region.find('{urn:ihe:iti:csd:2013}record').get('created'),
+                "updated_at":region.find('{urn:ihe:iti:csd:2013}record').get('updated'),
+                "type":region_types[region.find('{urn:ihe:iti:csd:2013}codedType').get('code')],
+                'id':region.find('{urn:ihe:iti:csd:2013}otherID').get('code')} for region in return_text.iter('{urn:ihe:iti:csd:2013}organization')]    
+    response = {
       "status": OK,
-      "regions": map(_region_to_dictionary, regions)}
+      "regions": regions}
   return http.to_json_response(response)
 
 def _facility_to_dictionary(facility):
@@ -251,7 +289,7 @@ blank = '''<CSD xmlns="urn:ihe:iti:csd:2013" xmlns:csd="urn:ihe:iti:csd:2013">
   <providerDirectory/>
 </CSD>'''
 
-def returnRegion(districtID, csd_document='CSD-District-List'):
+def returnRegion(districtID, csd_document='CSD-HNP'):
   if districtID == 'None':
     return 'None'
   else:
@@ -271,22 +309,21 @@ def returnRegion(districtID, csd_document='CSD-District-List'):
       return None
     else:
       if len(return_text) == len(blank):
-        return returnRegion(districtID, 'CSD-County-List')
+        return returnRegion(districtID, 'CSD-HNP')
       else:        
         return_text = ET.fromstring(return_text)
         region = return_text.find('{urn:ihe:iti:csd:2013}organizationDirectory/{urn:ihe:iti:csd:2013}organization')          
         return {'id':region.get('entityID'), 'title':region.find('{urn:ihe:iti:csd:2013}primaryName').text}
 
 def on_facility_index(request):
-  csd_document = 'CSD-Facility-List'
+  csd_document = 'CSD-HNP'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
-  write_file = os.system("touch /tmp/csd_query_facility.xml")
-  write_file = open('/tmp/csd_query_facility.xml', 'r+')
-  requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")  
-  region_id = ET.SubElement(requestParams, 'csd:id', entityID="")
-  region_id.text = ""
-  string = ET.tostring(requestParams)
-  write_file.write(string.replace("xmlns", "xmlns:csd"))
+  write_file = os.system("rm /tmp/csd_query_facility.xml; touch /tmp/csd_query_facility.xml")
+  write_file = open('/tmp/csd_query_facility.xml', 'r+')  
+  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:organization><csd:codedType code="1" codingScheme="2.25.220237170085002235066132143088055219024007198012" /></csd:organization></csd:requestParams>'
+  
+  write_file.write(query_string)
+  write_file.close()
   query_file = ('/tmp/csd_query_facility.xml')    
   return_text = csd_query(query_file, csd_document, csd_function)
   if return_text == False:
@@ -295,17 +332,15 @@ def on_facility_index(request):
       }
   else:
     return_text = ET.fromstring(return_text)
-    facs = [{'region_id':retDistrictID(facility), 'id':facility.get('entityID'), 'title':facility.find('{urn:ihe:iti:csd:2013}primaryName').text} for facility in return_text.iter('{urn:ihe:iti:csd:2013}facility')]
-    fetch = []    
-    for fac in facs:
-      print(fac['region_id'])
-      reg =  returnRegion(fac['region_id'], 'CSD-District-List')
-      fac['region'] = reg
-      print(fac)
-      fetch.append(fac)
+    facilities = [{'parent_facility_id':facility.find('{urn:ihe:iti:csd:2013}parent').get('entityID'),
+                'title':facility.find('{urn:ihe:iti:csd:2013}primaryName').text,                
+                'created_at':facility.find('{urn:ihe:iti:csd:2013}record').get('created'),
+                "updated_at":facility.find('{urn:ihe:iti:csd:2013}record').get('updated'),
+                "type":facility_types[facility.find('{urn:ihe:iti:csd:2013}codedType').get('code')],
+                'id':facility.find('{urn:ihe:iti:csd:2013}otherID').get('code')} for facility in return_text.iter('{urn:ihe:iti:csd:2013}organization')]    
     response = {
       "status": OK,
-      "facilities": fetch}
+      "facilities": facilities}
   return http.to_json_response(response)
 
 _address_pat = re.compile(u"^.{1,255}$")
