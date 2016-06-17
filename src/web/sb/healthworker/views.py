@@ -80,33 +80,15 @@ def _specialty_to_dictionary(specialty):
           "title": specialty.title}
 
 def on_specialty_index(request):
-  """Get a list of specialties"""    
-  write_file = os.system("touch /tmp/csd_query_facility.xml")
-  write_file = open('/tmp/csd_query_facility.xml', 'r+')
-  requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")  
-  region_id = ET.SubElement(requestParams, 'csd:id', entityID="")
-  region_id.text = ""
-  string = ET.tostring(requestParams)
-  write_file.write(string.replace("xmlns", "xmlns:csd"))
-  
-  query_file = ('/tmp/csd_query_facility.xml')    
-  csd_document = 'CSD-HNP'
-  csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
-  request_file = query_file
-  full_url = BASE_URL + csd_document + BASE_URL_SUFFIX + csd_function
-  file_set = {'file': (request_file, open(request_file, 'rb'), 'text/xml', {'Expires': '0'})}
-  r = requests.post(full_url, files=file_set)
-  if r.status_code == 200:
-    return_text = ET.fromstring(r.content)
-    specialties = [{'id':specialty.get('entityID'), 'title':specialty.find('{urn:ihe:iti:csd:2013}primaryName').text} for specialty in return_text.iter('{urn:ihe:iti:csd:2013}organization')]
-    response = {
-      "status": OK,
-      "specialties": specialties}
-  else:
-    response = {
-      "status": "FAILED"
-    }
-  return http.to_json_response(response)
+  """Get a list of specialties"""
+  specialties = models.Specialty.objects.all()
+
+  # Filter out user submitted specialties:
+  specialties = [i for i in specialties if not i.is_user_submitted]
+  specialties.sort(key=lambda i: ((sys.maxint - i.priority), i.title))
+  return http.to_json_response({
+    "status": OK,
+    "specialties": map(_specialty_to_dictionary, specialties)})
 
 def on_mct_payroll_index(request):
   """Get a list of ministry of tanzania payroll entries"""
