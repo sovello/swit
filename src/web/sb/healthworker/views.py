@@ -55,6 +55,16 @@ def csd_query(query_file, csd_document, csd_function):
     else:
       return False
 
+
+def is_none(element, attribute=''):
+  if element is None:
+    return "null"
+  else:
+    if attribute == '':
+      return element.text
+    else:
+      return element.get(attribute)
+  
 def _specialty_to_dictionary(specialty):
   "Convert a Specialty to a dictionary suitable for JSON encoding"
   return {"created_at": specialty.created_at,
@@ -217,12 +227,13 @@ region_types = {
   "5": "Village",
   "6": "Ward",
 }
+
 def on_region_index(request):
   csd_document = 'CSD-HNP'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:organization-search'
   write_file = os.system("rm /tmp/csd_query_region.xml; touch /tmp/csd_query_region.xml")
   write_file = open('/tmp/csd_query_region.xml', 'r+')  
-  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:organization><csd:codedType code="1" codingScheme="2.25.220237170085002235066132143088055219024007198012" /></csd:organization></csd:requestParams>'
+  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:codedType codingScheme="2.25.220237170085002235066132143088055219024007198012" /></csd:requestParams>'
   
   #region_filters = code="2" codingScheme="2.25.220237170085002235066132143088055219024007198012"
   #district_filters code="3" codingScheme="2.25.220237170085002235066132143088055219024007198012"
@@ -236,13 +247,16 @@ def on_region_index(request):
       "status": "FAILED"
       }
   else:
+    print(return_text)
     return_text = ET.fromstring(return_text)
-    regions = [{'parent_region_id':region.find('{urn:ihe:iti:csd:2013}parent').get('entityID'),
-                'title':region.find('{urn:ihe:iti:csd:2013}primaryName').text,                
-                'created_at':region.find('{urn:ihe:iti:csd:2013}record').get('created'),
-                "updated_at":region.find('{urn:ihe:iti:csd:2013}record').get('updated'),
-                "type":region_types[region.find('{urn:ihe:iti:csd:2013}codedType').get('code')],
-                'id':region.find('{urn:ihe:iti:csd:2013}otherID').get('code')} for region in return_text.iter('{urn:ihe:iti:csd:2013}organization')]    
+    regions = [
+      {
+        'parent_region_id':is_none(region.find('{urn:ihe:iti:csd:2013}parent'), 'entityID'),
+        'title':is_none(region.find('{urn:ihe:iti:csd:2013}primaryName'), ),
+        'created_at':is_none(region.find('{urn:ihe:iti:csd:2013}record'), 'created'),
+        "updated_at":is_none(region.find('{urn:ihe:iti:csd:2013}record'), 'updated'),
+        "type":region_types[region.find('{urn:ihe:iti:csd:2013}codedType').get('code')],
+        'id':is_none(region.find('{urn:ihe:iti:csd:2013}otherID'), 'code')} for region in return_text.iter('{urn:ihe:iti:csd:2013}organization')]                
     response = {
       "status": OK,
       "regions": regions}
@@ -320,7 +334,7 @@ def on_facility_index(request):
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:facility-search'
   write_file = os.system("rm /tmp/csd_query_facility.xml; touch /tmp/csd_query_facility.xml")
   write_file = open('/tmp/csd_query_facility.xml', 'r+')  
-  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:organization><csd:codedType code="1" codingScheme="2.25.220237170085002235066132143088055219024007198012" /></csd:organization></csd:requestParams>'
+  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:facility><csd:codedType codingScheme="2.25.065073125158126083079071176122160207089182210156" /></csd:facility></csd:requestParams>'
   
   write_file.write(query_string)
   write_file.close()
@@ -332,12 +346,18 @@ def on_facility_index(request):
       }
   else:
     return_text = ET.fromstring(return_text)
-    facilities = [{'parent_facility_id':facility.find('{urn:ihe:iti:csd:2013}parent').get('entityID'),
-                'title':facility.find('{urn:ihe:iti:csd:2013}primaryName').text,                
-                'created_at':facility.find('{urn:ihe:iti:csd:2013}record').get('created'),
-                "updated_at":facility.find('{urn:ihe:iti:csd:2013}record').get('updated'),
-                "type":facility_types[facility.find('{urn:ihe:iti:csd:2013}codedType').get('code')],
-                'id':facility.find('{urn:ihe:iti:csd:2013}otherID').get('code')} for facility in return_text.iter('{urn:ihe:iti:csd:2013}organization')]    
+    facilities = [
+      {
+        'parent_facility_id':is_none(facility.find('{urn:ihe:iti:csd:2013}parent'), 'entityID'),
+        'title':is_none(facility.find('{urn:ihe:iti:csd:2013}primaryName')),                
+        'created_at':is_none(facility.find('{urn:ihe:iti:csd:2013}record'), 'created'),
+        "updated_at":is_none(facility.find('{urn:ihe:iti:csd:2013}record'), 'updated'),
+        #"owner":is_none(facility.find('{urn:ihe:iti:csd:2013}record'), 'updated'),
+        #"region_id":is_none(facility.find('{urn:ihe:iti:csd:2013}record'), 'updated'),
+        #"ownership_type":is_none(facility.find('{urn:ihe:iti:csd:2013}record'), 'updated'),
+        "serial_number":is_none(facility.find('{urn:ihe:iti:csd:2013}otherID[@assigningAuthorityName="HNP:facility:serial_number"]'), 'code'),
+        #"type":facility_types[is_none(facility.find('{urn:ihe:iti:csd:2013}codedType'), 'code')],
+        'id':is_none(facility.find('{urn:ihe:iti:csd:2013}otherID[@assigningAuthorityName="HNP:facility:id"]'), 'code')} for facility in return_text.iter('{urn:ihe:iti:csd:2013}facility')]    
     response = {
       "status": OK,
       "facilities": facilities}
