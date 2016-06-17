@@ -490,14 +490,15 @@ def on_health_workers_save(request):
 
 def on_health_workers_index(request):
   """Get an index of health care workers"""
-  csd_document = 'CSD-Provider-List'
+  csd_document = 'CSD-HNP'
   csd_function = 'urn:ihe:iti:csd:2014:stored-function:provider-search'
-  os.system("touch /tmp/provider.xml")
-  write_file = open('/tmp/provider.xml', 'r+')
-  requestParams = ET.Element('csd:requestParams', xmlns="urn:ihe:iti:csd:2013")
-  string = ET.tostring(requestParams)
-  write_file.write(string.replace("xmlns", "xmlns:csd"))  
-  query_file = ("/tmp/provider.xml")
+  write_file = os.system("rm /tmp/csd_query_provider.xml; touch /tmp/csd_query_provider.xml")
+  write_file = open('/tmp/csd_query_provider.xml', 'r+')  
+  query_string = '<csd:requestParams xmlns:csd="urn:ihe:iti:csd:2013"><csd:provider><csd:id entityID="2.25.065073125158126083079071176122160207089182210156">2.25.065073125158126083079071176122160207089182210156</csd:id></csd:provider></csd:requestParams>'
+  
+  write_file.write(query_string)
+  write_file.close()
+  query_file = ('/tmp/csd_query_provider.xml')    
   return_text = csd_query(query_file, csd_document, csd_function)
   if return_text == False:
     response = {
@@ -505,7 +506,25 @@ def on_health_workers_index(request):
       }
   else:
     return_text = ET.fromstring(return_text)
-    health_workers = [{"name":hworker.find("{urn:ihe:iti:csd:2013}demographic/{urn:ihe:iti:csd:2013}name/{urn:ihe:iti:csd:2013}commonName").text, "id":hworker.get("entityID"), "country":"TZ"} for hworker in return_text.iter('{urn:ihe:iti:csd:2013}provider')]
+    health_workers = [
+      {
+        "name":is_none(healthworker.find("{urn:ihe:iti:csd:2013}demographic/{urn:ihe:iti:csd:2013}name/{urn:ihe:iti:csd:2013}commonName")),
+        "id":is_none(healthworker.find('{urn:ihe:iti:csd:2013}otherID[@assigningAuthorityName="HNP:health_worker_id"]', "code")),        
+      "language":"",
+      "vodacom_phone":"",
+      "created_at":is_none(healthworker.find('{urn:ihe:iti:csd:2013}record'), 'created'),
+      "updated_at":is_none(healthworker.find('{urn:ihe:iti:csd:2013}record'), 'updated'),
+        "birthdate":"",
+      "email":"",
+      "mct_payroll_num":is_none(healthworker.find('{urn:ihe:iti:csd:2013}otherID[@assigningAuthorityName="HNP:MCT:payroll:check_number"]', "code")),
+      "mct_registration_num":is_none(healthworker.find('{urn:ihe:iti:csd:2013}credential/{urn:ihe:iti:csd:2013}number')),
+      "verification_state":"",
+      "other_phone":"",
+      "address":"",
+        "specialties":[],
+      "country":"TZ",      
+      } for healthworker in return_text.iter('{urn:ihe:iti:csd:2013}provider')
+    ]
     response = {
       "status": 0,
       "health_workers":health_workers
